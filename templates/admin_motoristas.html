@@ -1,11 +1,22 @@
 {% extends "base.html" %}
 {% block title %}Frota — Motoristas{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.frota-hero{background:linear-gradient(160deg,#0f172a,#14532d 55%,#052e16);color:#fff;padding:22px 18px 26px;border-radius:0 0 28px 28px}
+.frota-hero .brand-sub{color:#86efac;letter-spacing:.14em;text-transform:uppercase;font-size:11px;margin:0 0 8px}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:26px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.kpi{border-radius:18px}
+.page .btn{border-radius:14px}
+</style>
+{% endblock %}
 {% block body_class %}admin-body{% endblock %}
 {% block shell_class %}admin-shell admin-list-page{% endblock %}
 {% block content %}
-<div class="topbar">
-  <div class="brand-sub">Operação ao vivo</div>
+<div class="admin-hero frota-hero">
+  <p class="brand-sub">Operação ao vivo</p>
   <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Frota da central</span></h1>
 </div>
 <div class="page">
@@ -126,6 +137,8 @@
   {% endfor %}
 </div>
 {% endblock %}
+
+
 
 
 
