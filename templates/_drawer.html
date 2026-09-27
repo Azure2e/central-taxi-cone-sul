@@ -1,0 +1,27 @@
+<div id="menuLateral" style="position:fixed;top:0;right:-100%;width:280px;height:100%;background:#fff;z-index:9999;padding:20px;transition:.3s;">
+  <button type="button" id="fecharMenu" style="float:right;border:0;background:none;font-size:24px;">✕</button>
+  <h3 style="margin-top:48px;">Menu</h3>
+  <nav style="display:flex;flex-direction:column;gap:14px;margin-top:16px;">
+    <a href="/admin">📊 Dashboard</a>
+    <a href="/admin/motoristas">👨‍✈️ Motoristas</a>
+    <a href="/admin/corridas">🚕 Corridas</a>
+    <a href="/admin/encomendas">📦 Encomendas</a>
+    <a href="/admin/pagamentos">💵 Pagamento</a>
+    <a href="/admin/seguranca">🔒 Segurança</a>
+    <a href="/logout" style="color:#dc2626;margin-top:12px;">🚪 Sair</a>
+  </nav>
+</div>
+<div id="fundoEscuro" style="position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:9998;"></div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var btn = document.getElementById("btnMenu");
+  var menu = document.getElementById("menuLateral");
+  var fundo = document.getElementById("fundoEscuro");
+  var fechar = document.getElementById("fecharMenu");
+  function abrir() { if (menu && fundo) { menu.style.right = "0"; fundo.style.display = "block"; } }
+  function fecha() { if (menu && fundo) { menu.style.right = "-100%"; fundo.style.display = "none"; } }
+  if (btn) btn.onclick = abrir;
+  if (fechar) fechar.onclick = fecha;
+  if (fundo) fundo.onclick = fecha;
+});
+</script>

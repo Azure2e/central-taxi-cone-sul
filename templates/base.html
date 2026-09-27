@@ -91,6 +91,8 @@
   </script>
   <script>window.VAPID_PUBLIC = {{ (vapid_public or '')|tojson }};</script>
   <script src="{{ url_for('static', filename='js/pwa.js') }}"></script>
+    {% include '_drawer.html' %}
 </body>
 </html>
+
 
