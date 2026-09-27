@@ -1,13 +1,52 @@
 {% extends "base.html" %}
 {% block title %}Encomendas{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.enc-hero{background:linear-gradient(160deg,#0f172a,#7c2d12 55%,#431407);color:#fff;padding:22px 18px 26px;border-radius:0 0 28px 28px}
+.enc-hero .brand-sub{color:#fdba74;letter-spacing:.14em;text-transform:uppercase;font-size:11px;margin:0 0 8px}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:24px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.soft-card{border-radius:18px}
+</style>
+{% endblock %}
 {% block body_class %}admin-body{% endblock %}
 {% block content %}
-<div class="topbar">
-  <div class="brand-sub">Operação</div>
-  <h1>Encomendas</h1>
+<div class="admin-hero enc-hero">
+  <p class="brand-sub">Operação · encomendas</p>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Encomendas</span></h1>
 </div>
 <div class="page">
+  <form method="post" class="soft-card">
+    <h2 style="font-size:16px">Registrar encomenda</h2>
+    <p class="hint">O cliente também pede no app: Encomenda → Enviar.</p>
+    <div class="form-group">
+      <label>Cliente</label>
+      <select name="sender_id" required>
+        <option value="">Selecione o passageiro</option>
+        {% for u in passengers %}
+        <option value="{{ u.id }}">{{ u.name }} · {{ u.phone }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Rota</label>
+      <select name="route_id" required>
+        {% for r in routes %}
+        <option value="{{ r.id }}">{{ r.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group"><label>Coleta</label><input name="pickup_address" required></div>
+    <div class="form-group"><label>Entrega</label><input name="delivery_address" required></div>
+    <div class="form-group"><label>Quem recebe</label><input name="recipient_name" required></div>
+    <div class="form-group"><label>WhatsApp de quem recebe</label><input name="recipient_phone"></div>
+    <button class="btn btn-primary btn-block" type="submit">Lançar na fila</button>
+  </form>
+  {% if not passengers %}
+  <p class="hint">Cadastre um cliente em /cadastro para aparecer na lista.</p>
+  {% endif %}
   {% for p in parcels %}
   <article class="fleet-card">
     <header>
@@ -15,14 +54,10 @@
         <strong>#{{ p.id }} · {{ p.route_label }}</strong>
         <div class="sub">{{ p.sender_name }} · {{ p.sender_phone }}</div>
       </div>
-      <span class="badge {{ 'orange' if p.status=='pendente' else 'green' if p.status=='entregue' else 'blue' }}">{{ p.status }}</span>
+      <span class="badge">{{ p.status }}</span>
     </header>
-    <ul class="fleet-meta">
-      <li>📦 {{ p.size }} · R$ {{ '%.2f'|format(p.price or 0) }}</li>
-      <li>📤 {{ p.pickup_address }}</li>
-      <li>📥 {{ p.delivery_address }} · {{ p.recipient_name }}</li>
-      {% if p.driver_name %}<li>🚕 {{ p.driver_name }} · {{ p.plate }}</li>{% endif %}
-    </ul>
+    <p>📤 {{ p.pickup_address }}</p>
+    <p>📥 {{ p.delivery_address }} · {{ p.recipient_name }}</p>
     {% if p.status=='pendente' %}
     <form method="post" action="{{ url_for('admin_parcel_dispatch', pid=p.id) }}" class="ops-form">
       <select name="driver_id" required>
@@ -36,9 +71,11 @@
     {% endif %}
   </article>
   {% else %}
-  <div class="list-empty">Nenhuma encomenda.</div>
+  <div class="soft-card empty-ops" style="text-align:center;padding:28px 16px">
+    <div style="font-size:36px">📦</div>
+    <strong>Nenhuma encomenda na fila</strong>
+    <p>Lance acima ou peça no app do cliente.</p>
+  </div>
   {% endfor %}
 </div>
 {% endblock %}
-
-
