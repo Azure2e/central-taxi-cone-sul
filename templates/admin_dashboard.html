@@ -2,6 +2,13 @@
 {% block title %}Painel de controle{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.submenu-topo,.ctrl-grid,.nav,.admin-nav,#pwa-install,.admin-kicker{display:none!important}
+.admin-hero.mesa-hero{background:linear-gradient(160deg,#052e16,#0f172a 45%,#14532d);color:#fff;padding:22px 18px 28px;border-radius:0 0 28px 28px}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:26px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.hero-line{opacity:.75;margin:8px 0 0}
+</style>
 {% endblock %}
 {% block body_class %}admin-body{% endblock %}
 {% block shell_class %}admin-shell{% endblock %}
@@ -11,7 +18,7 @@
     <span>Cone Sul</span>
     <span class="live-dot"><i></i> ao vivo</span>
   </div>
-  <h1>Painel de controle</h1>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Painel de controle</span></h1>
   <p class="hero-line">{{ now_label }} · {{ user.name }}</p>
 </div>
 <div class="admin-page" style="padding-bottom:0">
@@ -162,5 +169,6 @@
   </div>
 </div>
 {% endblock %}
+
 
 
