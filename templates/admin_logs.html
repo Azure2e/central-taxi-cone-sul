@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Logs ao vivo{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Monitor</div>
+  <h1>Logs em tempo real</h1>
+</div>
+<div class="page">
+  <p class="hint">Atualiza sozinho a cada 5 segundos.</p>
+  <h2>Erros</h2>
+  <div id="box-err" class="soft-card">Carregando…</div>
+  <h2 style="margin-top:16px">Auditoria</h2>
+  <div id="box-aud" class="soft-card">Carregando…</div>
+</div>
+<script>
+function paint(el, rows, cols) {
+  if (!rows || !rows.length) { el.innerHTML = "Nenhum registro."; return; }
+  el.innerHTML = rows.map(function (r) {
+    return "<p><strong>" + (r[cols[0]] || "") + "</strong> · " + (r[cols[1]] || "") + "<br><span class='sub'>" + (r[cols[2]] || "") + " · " + (r[cols[3]] || "") + "</span></p>";
+  }).join("");
+}
+function tick() {
+  fetch("/admin/logs.json").then(r => r.json()).then(function (d) {
+    paint(document.getElementById("box-err"), d.errors, ["created_at","level","source","message"]);
+    paint(document.getElementById("box-aud"), d.audits, ["created_at","action","actor_name","detail"]);
+  }).catch(function () {});
+}
+tick();
+setInterval(tick, 5000);
+</script>
+{% endblock %}

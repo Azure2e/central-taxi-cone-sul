@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Painel de controle{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell{% endblock %}
+{% block content %}
+<div class="admin-hero mesa-hero">
+  <div class="admin-kicker">
+    <span>Cone Sul</span>
+    <span class="live-dot"><i></i> ao vivo</span>
+  </div>
+  <h1>Painel de controle</h1>
+  <p class="hero-line">{{ now_label }} · {{ user.name }}</p>
+</div>
+<div class="admin-page" style="padding-bottom:0">
+  <div class="ctrl-grid">
+    <a class="ctrl" href="{{ url_for('admin_drivers') }}">Motoristas</a>
+    <a class="ctrl" href="{{ url_for('admin_rides') }}">Corridas</a>
+    <a class="ctrl" href="{{ url_for('admin_parcels') }}">Encomendas</a>
+    <a class="ctrl" href="{{ url_for('admin_payments') }}">Mensalidades</a>
+    <a class="ctrl" href="{{ url_for('admin_config') }}">WhatsApp</a>
+    <a class="ctrl" href="{{ url_for('admin_security') }}">Segurança</a>
+  </div>
+</div>
+
+<div class="admin-page">
+  <div class="rev-card">
+    <div class="rev-top">
+      <div>
+        <div class="lbl">Receita do mês</div>
+        <div class="amount">R$ {{ receita_fmt }}</div>
+      </div>
+      <span class="trend">{{ rev.pagos or 0 }}/{{ rev.total or 0 }} pagos</span>
+    </div>
+    <div class="meta">{{ month_label }}</div>
+  </div>
+
+  <div class="kpi-grid stagger">
+    <a class="kpi mint" href="{{ url_for('admin_drivers', sit='ativo') }}">
+      <div class="k">Na rua</div>
+      <div class="n">{{ ativos }}</div>
+      <div class="s">{{ bloqueados }} bloqueados</div>
+    </a>
+    <a class="kpi blush" href="{{ url_for('admin_payments') }}">
+      <div class="k">Taxa do mês</div>
+      <div class="n">{{ pend_pay }}</div>
+      <div class="s">pendências para cobrar</div>
+    </a>
+    <a class="kpi sky" href="{{ url_for('admin_rides') }}">
+      <div class="k">Fila agora</div>
+      <div class="n">{{ ride_stats.pendentes or 0 }}</div>
+      <div class="s">{{ ride_stats.andamento or 0 }} em curso</div>
+    </a>
+    <a class="kpi gold" href="{{ url_for('admin_rides') }}">
+      <div class="k">Família</div>
+      <div class="n">{{ ride_stats.agendas or 0 }}</div>
+      <div class="s">casas com horário</div>
+    </a>
+  </div>
+
+  <div class="sec-head">
+    <div>
+      <h2>Fila da central</h2>
+      <p>Despache o taxista da mesma rota</p>
+    </div>
+    <a href="{{ url_for('admin_rides') }}">Todas</a>
+  </div>
+
+  {% if not pending_rides %}
+    <div class="soft-card empty-ops">
+      <div class="empty-ico">🚕</div>
+      <strong>Fila livre</strong>
+      <p>Quando o cliente pedir corrida ou encomenda, aparece aqui para despachar.</p>
+    </div>
+  {% endif %}
+  {% for c in pending_rides %}
+  <div class="queue-card">
+    <div class="top">
+      <strong>{{ c.route_label }}</strong>
+      <span class="tag {{ 'fam' if c.kind=='agendada' else '' }}">
+        {% if c.kind=='agendada' %}Família · {{ c.seats }}{% else %}Imediata{% endif %}
+      </span>
+    </div>
+    <p>{{ c.passenger_name }}{% if c.house_label %} · 🏠 {{ c.house_label }}{% endif %}</p>
+    <p>📍 {{ c.pickup_address }}</p>
+    {% if c.scheduled_at %}<p>🗓️ {{ c.scheduled_at }}</p>{% endif %}
+    {% set folks = people_map.get(c.id, []) %}
+    {% if folks %}
+    <p class="sub">{% for p in folks %}{{ p.name }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('admin_dispatch', ride_id=c.id) }}" class="ops-form">
+      <select name="driver_id" required>
+        <option value="">Taxista livre nesta rota</option>
+        {% for d in livres_by_route.get(c.route_id, []) %}
+        <option value="{{ d.id }}">{{ d.name }} · {{ d.plate }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-green btn-sm" type="submit">Despachar</button>
+    </form>
+    <form method="post" action="{{ url_for('admin_cancel_ride', ride_id=c.id) }}" onsubmit="return confirm('Cancelar esta corrida?')">
+      <button class="btn btn-ghost btn-sm" type="submit">Cancelar pedido</button>
+    </form>
+  </div>
+  {% endfor %}
+
+  <div class="sec-head" style="margin-top:22px">
+    <div>
+      <h2>Frota ({{ all_count }})</h2>
+      <p>Status de pagamento e fila</p>
+    </div>
+    <a href="{{ url_for('admin_drivers') }}">Abrir módulo</a>
+  </div>
+
+  <div class="driver-panel">
+    <div class="cols">
+      <div>Nome</div><div>Rota</div><div>Taxa</div><div style="text-align:right">Ação</div>
+    </div>
+    {% for d in drivers %}
+    <div class="d-row">
+      <div class="who-mini">
+        <div class="ava" style="background:{{ d.color or '#0b3a66' }}">{{ d.initials or 'TX' }}</div>
+        <div>
+          <b>{{ d.name }}</b>
+          <small>{{ d.plate or 's/ placa' }}</small>
+        </div>
+      </div>
+      <div class="route-tiny">{{ d.route_label.replace('Vilhena x ', '') if d.route_label else '-' }}</div>
+      <div>
+        {% if d.status=='bloqueado' %}
+          <span class="pill off">Fora</span>
+        {% elif d.payment_status=='pago' %}
+          <span class="pill ok">Pago</span>
+        {% else %}
+          <span class="pill wait">Pendente</span>
+        {% endif %}
+      </div>
+      <div class="mini-acts">
+        {% if d.status=='ativo' %}
+        <form method="post" action="{{ url_for('admin_block', driver_id=d.id) }}">
+          <button class="btn-lock" type="submit">Tirar da fila</button>
+        </form>
+        {% else %}
+        <form method="post" action="{{ url_for('admin_unblock', driver_id=d.id) }}">
+          <button class="btn-free" type="submit">Colocar na rua</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="cta-stack">
+    <a class="cta-add" href="{{ url_for('admin_drivers') }}">＋ Cadastrar taxista</a>
+    <div class="cta-row">
+      <a class="cta-ghost" href="{{ url_for('admin_payments') }}">💵 Mensalidades</a>
+      <form method="post" action="{{ url_for('admin_block_unpaid') }}" onsubmit="return confirm('Bloquear todos com taxa pendente?')">
+        <button class="cta-danger" type="submit" style="width:100%">⚠ Bloquear inadimplentes</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block nav %}{% set tab='dash' %}{% include "_nav_admin.html" %}{% endblock %}

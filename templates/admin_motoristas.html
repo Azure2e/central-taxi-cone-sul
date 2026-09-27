@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Frota — Motoristas{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Operação ao vivo</div>
+  <h1>Frota da central</h1>
+</div>
+<div class="page">
+  <div class="kpi-grid stagger">
+    <div class="kpi mint"><div class="k">Na rua</div><div class="n">{{ totals.ativos or 0 }}</div><div class="s">ativos agora</div></div>
+    <div class="kpi gold"><div class="k">Mensalidade</div><div class="n">{{ totals.pagos or 0 }}</div><div class="s">em dia</div></div>
+    <div class="kpi blush"><div class="k">Pendentes</div><div class="n">{{ totals.pendentes or 0 }}</div><div class="s">cobrar taxa</div></div>
+    <div class="kpi sky"><div class="k">Vagas</div><div class="n">{{ 40 - (totals.total or 0) }}</div><div class="s">de 40 · bloq {{ totals.bloqueados or 0 }} · susp {{ totals.suspensos or 0 }}</div></div>
+  </div>
+
+  <form method="get" class="fleet-filter">
+    <input name="q" value="{{ q }}" placeholder="Nome, WhatsApp, placa ou carro">
+    <select name="rota">
+      <option value="">Todas as rotas</option>
+      {% for r in routes %}
+      <option value="{{ r.id }}" {% if rota==r.id|string %}selected{% endif %}>{{ r.label }}</option>
+      {% endfor %}
+    </select>
+    <div class="row2">
+      <select name="sit">
+        <option value="">Situação</option>
+        <option value="ativo" {% if sit=='ativo' %}selected{% endif %}>Ativo</option>
+        <option value="bloqueado" {% if sit=='bloqueado' %}selected{% endif %}>Bloqueado</option>
+        <option value="suspenso" {% if sit=='suspenso' %}selected{% endif %}>Suspenso</option>
+      </select>
+      <select name="pag">
+        <option value="">Mensalidade</option>
+        <option value="pago" {% if pag=='pago' %}selected{% endif %}>Pago</option>
+        <option value="pendente" {% if pag=='pendente' %}selected{% endif %}>Pendente</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Filtrar frota</button>
+  </form>
+
+  <details class="card fleet-new" open>
+    <summary>+ Cadastrar taxista (até 40)</summary>
+    <form method="post" action="{{ url_for('admin_new_driver') }}" style="margin-top:12px">
+      <div class="row2">
+        <div class="form-group"><label>Nome completo</label><input name="name" required placeholder="Nome do taxista"></div>
+        <div class="form-group"><label>WhatsApp</label><input name="phone" required placeholder="69 99999-0000"></div>
+      </div>
+      <div class="row2">
+        <div class="form-group"><label>Placa Mercosul</label><input name="plate" placeholder="ABC1D23"></div>
+        <div class="form-group"><label>Veículo</label><input name="car_model" placeholder="Voyage 1.6"></div>
+      </div>
+      <div class="row2">
+        <div class="form-group">
+          <label>Rota fixa</label>
+          <select name="route_id" required>
+            {% for r in routes %}<option value="{{ r.id }}">{{ r.label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label>Senha inicial</label><input name="password" value="123456"></div>
+      </div>
+      <button class="btn btn-green btn-block" type="submit" {% if (totals.total or 0) >= 40 %}disabled{% endif %}>Registrar na frota</button>
+    </form>
+  </details>
+
+  <p class="hint">{{ drivers|length }} neste filtro · {{ totals.total or 0 }}/40 na frota</p>
+  {% if (totals.total or 0) >= 40 %}
+  <p class="flash err">Limite de 40 taxistas. Remova alguém para cadastrar outro.</p>
+  {% endif %}
+
+  {% if not drivers %}
+    <div class="list-empty">Frota vazia. Cadastre o primeiro taxista acima.</div>
+  {% endif %}
+
+  {% for d in drivers %}
+  <article class="fleet-card {{ 'is-blocked' if d.status!='ativo' else '' }}">
+    <header>
+      <div class="ava" style="background:{{ d.color or '#0b3a66' }}">{{ d.initials or 'TX' }}</div>
+      <div class="grow">
+        <strong>{{ d.name }}</strong>
+        <div class="sub">{{ d.phone_fmt }} · {{ d.plate or 'sem placa' }}</div>
+      </div>
+      <div class="fleet-flags">
+        {% if d.payment_status=='pago' %}<span class="badge green">Mensalidade ok</span>
+        {% else %}<span class="badge orange">Taxa pendente</span>{% endif %}
+        {% if d.status=='bloqueado' %}<span class="badge red">Bloqueado</span>
+        {% elif d.status=='suspenso' %}<span class="badge orange">Suspenso</span>
+        {% else %}<span class="badge blue">Na fila</span>{% endif %}
+        {% if d.cnh_state=='vencida' %}<span class="badge red">CNH vencida</span>
+        {% elif d.cnh_state=='vence' %}<span class="badge orange">CNH {{ d.cnh_left }}d</span>
+        {% elif d.docs_ok %}<span class="badge green">CNH ok</span>
+        {% else %}<span class="badge orange">CNH pendente</span>{% endif %}
+      </div>
+    </header>
+    <ul class="fleet-meta">
+      <li>🚕 {{ d.car_model or 'Veículo não informado' }}</li>
+      <li>🗺️ {{ d.route_label or 'Sem rota' }}</li>
+      <li>💵 R$ {{ '%.2f'|format(d.monthly_fee or 50) }}/mês</li>
+      <li>📋 {{ d.corridas_abertas or 0 }} em curso · {{ d.concluidas or 0 }} concluídas</li>
+    </ul>
+    <div class="actions">
+      {% if d.wa %}
+      <a class="btn btn-green btn-sm" href="https://wa.me/55{{ d.wa }}" target="_blank" rel="noopener">WhatsApp</a>
+      {% endif %}
+      <a class="btn btn-ghost btn-sm" href="{{ url_for('admin_driver_docs', driver_id=d.id) }}">Documentos</a>
+      {% if d.status=='ativo' %}
+      <form method="post" action="{{ url_for('admin_block', driver_id=d.id) }}">
+        <input type="hidden" name="motivo" value="bloqueio pela frota">
+        <button class="btn btn-red btn-sm" type="submit">Bloquear</button>
+      </form>
+      <form method="post" action="{{ url_for('admin_suspend', driver_id=d.id) }}">
+        <input type="hidden" name="motivo" value="suspensão pela frota">
+        <button class="btn btn-ghost btn-sm" type="submit">Suspender</button>
+      </form>
+      {% else %}
+      <form method="post" action="{{ url_for('admin_unblock', driver_id=d.id) }}">
+        <button class="btn btn-primary btn-sm" type="submit">Liberar</button>
+      </form>
+      {% endif %}
+      <form method="post" action="{{ url_for('admin_remove', driver_id=d.id) }}" onsubmit="return confirm('Remover {{ d.name }} da frota?')">
+        <button class="btn btn-ghost btn-sm" type="submit">Desligar</button>
+      </form>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='mot' %}{% include "_nav_admin.html" %}{% endblock %}

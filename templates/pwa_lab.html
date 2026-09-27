@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Teste PWA / Service Worker{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Configuração</div>
+  <h1>Service worker e offline</h1>
+</div>
+<div class="page">
+  <p class="hint">O worker fica em <code>/sw.js</code> com escopo <code>/</code>. Cache: <code>conesul-pwa-v2</code>.</p>
+  <div class="soft-card">
+    <p><strong>Status:</strong> <span id="sw-status">verificando…</span></p>
+    <p class="sub" id="sw-scope"></p>
+  </div>
+  <div class="actions" style="margin:12px 0">
+    <button class="btn btn-primary" type="button" id="btn-reg">Registrar SW</button>
+    <button class="btn btn-ghost" type="button" id="btn-unreg">Remover SW</button>
+    <button class="btn btn-ghost" type="button" id="btn-cache">Listar cache</button>
+  </div>
+  <pre id="sw-log" style="white-space:pre-wrap;background:#111;color:#9ee6d7;padding:12px;border-radius:12px;min-height:120px;font-size:12px"></pre>
+  <h2 style="font-size:16px;margin:16px 0 8px">Teste offline</h2>
+  <ol class="hint" style="padding-left:18px">
+    <li>Clique em Registrar SW e espere “ativado”.</li>
+    <li>No Chrome: F12 → Application → Service Workers → Offline.</li>
+    <li>Recarregue esta página. Deve abrir <code>/offline</code> ou o cache.</li>
+    <li>Desmarque Offline para voltar à rede.</li>
+  </ol>
+  <a class="btn btn-green btn-block" href="{{ url_for('offline') }}">Abrir página /offline agora</a>
+</div>
+<script>
+(function () {
+  var log = document.getElementById("sw-log");
+  var status = document.getElementById("sw-status");
+  var scope = document.getElementById("sw-scope");
+  function say(t) { log.textContent = t + "\n" + log.textContent; }
+  async function refresh() {
+    if (!("serviceWorker" in navigator)) {
+      status.textContent = "navegador sem service worker";
+      return;
+    }
+    const reg = await navigator.serviceWorker.getRegistration("/");
+    if (!reg) { status.textContent = "não registrado"; scope.textContent = ""; return; }
+    var state = (reg.active && reg.active.state) || (reg.installing && "instalando") || (reg.waiting && "aguardando") || "registrado";
+    status.textContent = state;
+    scope.textContent = "escopo " + (reg.scope || "/");
+  }
+  document.getElementById("btn-reg").onclick = async function () {
+    try {
+      const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+      say("registrado: " + reg.scope);
+      await refresh();
+    } catch (e) { say("erro: " + e); }
+  };
+  document.getElementById("btn-unreg").onclick = async function () {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    for (const r of regs) await r.unregister();
+    const keys = await caches.keys();
+    for (const k of keys) await caches.delete(k);
+    say("SW e caches removidos");
+    await refresh();
+  };
+  document.getElementById("btn-cache").onclick = async function () {
+    const keys = await caches.keys();
+    var lines = ["caches: " + keys.join(", ")];
+    for (const k of keys) {
+      const c = await caches.open(k);
+      const reqs = await c.keys();
+      lines.push(k + " → " + reqs.length + " arquivo(s)");
+      reqs.slice(0, 20).forEach(function (r) { lines.push("  " + r.url); });
+    }
+    say(lines.join("\n"));
+  };
+  refresh();
+})();
+</script>
+{% endblock %}

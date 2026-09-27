@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Perfil{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Conta</div>
+  <h1>{{ user.name.split()[0] }}</h1>
+</div>
+<div class="page">
+  <div class="card">
+    <p class="sub">Corridas registradas</p>
+    <p style="font-size:28px;font-weight:800">{{ stats.total or 0 }}</p>
+    <p class="sub">{{ stats.feitas or 0 }} concluídas</p>
+  </div>
+  <form method="post">
+    <div class="form-group">
+      <label>Nome</label>
+      <input name="name" value="{{ user.name }}">
+    </div>
+    <div class="form-group">
+      <label>Telefone</label>
+      <input value="{{ user.phone }}" disabled>
+    </div>
+    <div class="form-group">
+      <label>E-mail de login</label>
+      <input type="email" name="email" value="{{ user.email or '' }}">
+    </div>
+    <div class="form-group">
+      <label>E-mail de recuperação</label>
+      <input type="email" name="recovery_email" value="{{ user.recovery_email or '' }}">
+    </div>
+    <div class="form-group">
+      <label>Endereço da casa</label>
+      <input name="address" value="{{ user.address or '' }}">
+    </div>
+    <div class="form-group">
+      <label>Nome da casa</label>
+      <input name="house_label" value="{{ user.house_label or '' }}">
+    </div>
+    <div class="form-group">
+      <label>GPS da casa (aviso dos 200 m)</label>
+      <input name="home_lat" id="home_lat" value="{{ user.home_lat or '' }}" placeholder="latitude">
+    </div>
+    <div class="form-group">
+      <label>Longitude</label>
+      <input name="home_lng" id="home_lng" value="{{ user.home_lng or '' }}" placeholder="longitude">
+    </div>
+    <button class="btn btn-ghost btn-block" type="button" id="btn-gps-casa">Usar minha localização</button>
+    <button class="btn btn-primary btn-block" type="submit" style="margin-top:8px">Salvar</button>
+  </form>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('account_emails') }}" style="margin-top:10px">Gerenciar e-mails</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('change_password') }}" style="margin-top:8px">Trocar senha</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('totp_setup') }}" style="margin-top:8px">Autenticação de dois fatores</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('logout') }}" style="margin-top:8px">Sair</a>
+</div>
+{% endblock %}
+{% block nav %}{% set tab='perfil' %}{% include "_nav_passenger.html" %}{% endblock %}

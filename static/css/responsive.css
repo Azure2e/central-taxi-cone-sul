@@ -1,0 +1,94 @@
+/* Módulo responsivo — celular, tablet e computador */
+
+html { -webkit-text-size-adjust: 100%; }
+
+.shell {
+  width: min(430px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 480px) {
+  body { background: #eef2f7; }
+  .shell,
+  .shell.admin-shell {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+    border: 0;
+  }
+  .admin-hero,
+  .topbar { padding-top: calc(14px + env(safe-area-inset-top)); }
+  .page, .admin-page { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+}
+
+@media (min-width: 720px) {
+  .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .fleet-filter { grid-template-columns: 1fr 1fr; }
+  .fleet-filter .row2,
+  .fleet-filter .btn { grid-column: 1 / -1; }
+}
+
+@media (min-width: 980px) {
+  .shell {
+    width: min(980px, calc(100% - 32px));
+    max-width: 980px;
+    border-radius: 24px;
+  }
+  .shell.admin-shell,
+  .shell.admin-list-page {
+    width: min(1120px, calc(100% - 40px));
+    max-width: 1120px;
+    border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(8, 25, 48, .16);
+  }
+  .admin-page,
+  .page { padding: 22px 24px 36px; }
+  .driver-panel .cols,
+  .driver-panel .d-row {
+    grid-template-columns: 1.4fr .9fr .7fr .9fr;
+  }
+  .admin-list-page .page {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .admin-list-page .page > .topbar,
+  .admin-list-page .page > .kpi-grid,
+  .admin-list-page .page > .fleet-filter,
+  .admin-list-page .page > .hint,
+  .admin-list-page .page > .rev-card,
+  .admin-list-page .page > .stat,
+  .admin-list-page .page > form,
+  .admin-list-page .page > details,
+  .admin-list-page .page > h2,
+  .admin-list-page .page > .soft-card {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1280px) {
+  .shell.admin-list-page { max-width: 1240px; }
+}
+
+@media (max-width: 360px) {
+  .topbar h1 { font-size: 20px; }
+  .kpi .n { font-size: 22px; }
+  .btn { font-size: 13px; }
+}
+
+.actions, .cta-row, .mini-acts, .ops-form {
+  flex-wrap: wrap;
+}
+
+img, svg, video { max-width: 100%; height: auto; }
+
+input, select, textarea, button {
+  max-width: 100%;
+}

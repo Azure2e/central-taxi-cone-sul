@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Offline — Cone Sul{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">PWA</div>
+  <h1>Você está offline</h1>
+</div>
+<div class="page">
+  <p class="hint">O service worker serviu esta página do cache. Quando a rede voltar, atualize.</p>
+  <a class="btn btn-primary btn-block" href="{{ url_for('home') }}">Tentar de novo</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('pwa_lab') }}">Abrir teste do PWA</a>
+</div>
+{% endblock %}

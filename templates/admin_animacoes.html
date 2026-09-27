@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Animações CSS{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Laboratório</div>
+  <h1>Animações CSS</h1>
+</div>
+<div class="page">
+  <p class="hint">As mesmas técnicas já estão ligadas no painel: entrada em cascata, gráfico desenhado, brilho nos botões e táxis flutuando no header.</p>
+  <div class="lab-grid">
+    <div class="lab-card">
+      <h3>Float</h3>
+      <div class="demo-orb"></div>
+    </div>
+    <div class="lab-card">
+      <h3>Pulse ring</h3>
+      <div class="demo-ring"></div>
+    </div>
+    <div class="lab-card">
+      <h3>Fill rise</h3>
+      <div class="demo-bar"><i></i></div>
+    </div>
+    <div class="lab-card">
+      <h3>Shine sweep</h3>
+      <div class="demo-shine">Cadastrar</div>
+    </div>
+    <div class="lab-card">
+      <h3>Pop spring</h3>
+      <span class="pill ok anim-pop">Pago</span>
+    </div>
+    <div class="lab-card">
+      <h3>Taxi drive</h3>
+      <div style="font-size:22px;animation:taxi-drive 4s ease-in-out infinite">🚕</div>
+    </div>
+  </div>
+  <div class="soft-card" style="margin-top:12px">
+    <strong>Respeito a acessibilidade</strong>
+    <p class="hint" style="margin:6px 0 0">Se o aparelho estiver com “reduzir movimento”, as animações param automaticamente (`prefers-reduced-motion`).</p>
+  </div>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('admin_dashboard') }}">Voltar ao painel</a>
+</div>
+{% endblock %}
+{% block nav %}{% set tab='cfg' %}{% include "_nav_admin.html" %}{% endblock %}

@@ -1,0 +1,8 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet.css') }}">
+<div id="{{ map_id|default('mapa-rotas') }}" class="mapa-rotas" style="height:{{ map_h|default('240px') }};border-radius:16px;margin:0 0 14px;border:1px solid var(--line);"></div>
+<script>
+  window.CONE_CITIES = {{ cities_geo|default({})|tojson }};
+  window.CONE_ROUTES = {{ routes_geo|default([])|tojson }};
+</script>
+<script src="{{ url_for('static', filename='vendor/leaflet.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mapa_vivo.js') }}"></script>

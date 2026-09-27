@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Configurações{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Sistema</div>
+  <h1>Configurações</h1>
+</div>
+<div class="page">
+  <p class="hint">Ajuste preço, distância e tempo estimado de cada rota da central.</p>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('pwa_lab') }}">📱 PWA · service worker e teste offline</a>
+  <form method="post" action="{{ url_for('admin_theme') }}" class="soft-card">
+    <h2 style="font-size:16px">Tema visual</h2>
+    <p class="hint">As variáveis CSS mudam em todo o app.</p>
+    <select name="ui_theme">
+      <option value="uber" {% if ui_theme=='uber' %}selected{% endif %}>Uber (preto + verde)</option>
+      <option value="auto" {% if ui_theme=='auto' %}selected{% endif %}>Automático (claro/escuro do aparelho)</option>
+      <option value="amazonia" {% if ui_theme=='amazonia' %}selected{% endif %}>Amazônia (verde + ouro)</option>
+      <option value="noite" {% if ui_theme=='noite' %}selected{% endif %}>Noite (escuro)</option>
+      <option value="ouro" {% if ui_theme=='ouro' %}selected{% endif %}>Ouro (táxi clássico)</option>
+      <option value="violeta" {% if ui_theme=='violeta' %}selected{% endif %}>Violeta</option>
+      <option value="claro" {% if ui_theme=='claro' %}selected{% endif %}>Claro neutro</option>
+    </select>
+    <button class="btn btn-primary btn-block" type="submit" style="margin-top:10px">Aplicar tema</button>
+  </form>
+  <form method="post" action="{{ url_for('admin_whatsapp') }}" class="soft-card">
+    <h2 style="font-size:16px">WhatsApp</h2>
+    <p class="hint">Com token da Meta o aviso sai sozinho. Sem token, fica o registro e o wa.me.</p>
+    <label class="hint"><input type="checkbox" name="wa_enabled" value="1" {% if cfg.get('wa_enabled','1')=='1' %}checked{% endif %}> Ativar</label>
+    <div class="form-group"><label>WhatsApp da central</label><input name="wa_phone" value="{{ cfg.get('wa_phone','') }}"></div>
+    <div class="form-group"><label>Phone ID</label><input name="wa_phone_id" value="{{ cfg.get('wa_phone_id','') }}"></div>
+    <div class="form-group"><label>Token (vazio = não troca)</label><input name="wa_token" type="password"></div>
+    <div class="form-group"><label>Template aprovado (opcional)</label><input name="wa_template" value="{{ cfg.get('wa_template','') }}" placeholder="hello_world"></div>
+    <div class="form-group"><label>Testar no número</label><input name="wa_test"></div>
+    <button class="btn btn-primary btn-block" type="submit">Salvar WhatsApp</button>
+  </form>
+  <form method="post">
+    {% for r in routes %}
+    <div class="card">
+      <strong>{{ r.label }}</strong>
+      <div class="row2" style="margin-top:10px">
+        <div class="form-group">
+          <label>Preço (R$)</label>
+          <input name="price_{{ r.id }}" type="number" step="0.01" value="{{ r.price }}">
+        </div>
+        <div class="form-group">
+          <label>Distância (km)</label>
+          <input name="dist_{{ r.id }}" type="number" step="0.1" value="{{ r.distance_km }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Duração (min)</label>
+        <input name="dur_{{ r.id }}" type="number" value="{{ r.duration_min }}">
+      </div>
+    </div>
+    {% endfor %}
+    <button class="btn btn-primary btn-block" type="submit">Salvar rotas</button>
+  </form>
+
+  <div class="soft-card" style="margin-top:16px">
+    <h2 style="font-size:16px;margin-bottom:8px">Geofencing automático</h2>
+    <p class="hint">O GPS do taxista avalia sozinho as cercas da casa e da cidade de destino. Entrar na casa avisa o cliente e pode mudar o status para “a caminho”.</p>
+    <form method="post" action="{{ url_for('admin_geofencing') }}">
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="geo_enabled" value="1" {% if cfg.get('geo_enabled','1')=='1' %}checked{% endif %}>
+          Ativar geofencing
+        </label>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="geo_auto_status" value="1" {% if cfg.get('geo_auto_status','1')=='1' %}checked{% endif %}>
+          Mudar status automaticamente ao entrar na casa
+        </label>
+      </div>
+      <div class="row2">
+        <div class="form-group">
+          <label>Raio da casa (m)</label>
+          <input name="geo_radius_casa" type="number" min="50" value="{{ cfg.get('geo_radius_casa','200') }}">
+        </div>
+        <div class="form-group">
+          <label>Raio do destino (m)</label>
+          <input name="geo_radius_destino" type="number" min="50" value="{{ cfg.get('geo_radius_destino','400') }}">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Salvar cercas</button>
+    </form>
+    {% for e in geo_events or [] %}
+    <p class="sub">#{{ e.ride_id }} · {{ e.event }} · {{ e.distance_m }} m · {{ e.detail }} · {{ e.created_at }}</p>
+    {% endfor %}
+  </div>
+
+  <div class="soft-card" style="margin-top:16px">
+    <h2 style="font-size:16px;margin-bottom:8px">Push dos motoristas</h2>
+    <p class="hint">O taxista recebe aviso no app (e no navegador, se autorizar) quando entra corrida na rota ou a central despacha para ele.</p>
+    <form method="post" action="{{ url_for('admin_driver_push_config') }}">
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="driver_push_enabled" value="1" {% if cfg.get('driver_push_enabled','1')=='1' %}checked{% endif %}>
+          Ativar avisos aos motoristas
+        </label>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="driver_push_fila" value="1" {% if cfg.get('driver_push_fila','1')=='1' %}checked{% endif %}>
+          Nova corrida ou família na rota
+        </label>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="driver_push_despacho" value="1" {% if cfg.get('driver_push_despacho','1')=='1' %}checked{% endif %}>
+          Quando a central despachar
+        </label>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="driver_push_email" value="1" {% if cfg.get('driver_push_email')=='1' %}checked{% endif %}>
+          Também enviar e-mail (SMTP)
+        </label>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Salvar push</button>
+    </form>
+    <form method="post" action="{{ url_for('admin_driver_push_test') }}" style="margin-top:8px">
+      <button class="btn btn-green btn-block" type="submit">Enviar teste para a frota ativa</button>
+    </form>
+  </div>
+  <a class="btn btn-primary btn-block" href="{{ url_for('admin_sql') }}" style="margin-top:12px">🗄️ Banco SQL e JWT</a>
+  <a class="btn btn-primary btn-block" href="{{ url_for('admin_security') }}" style="margin-top:8px">🛡️ Módulo de segurança</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('admin_animations') }}" style="margin-top:8px">✨ Laboratório de animações</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('logout') }}" style="margin-top:8px">Sair do painel</a>
+</div>
+{% endblock %}
+{% block nav %}{% set tab='cfg' %}{% include "_nav_admin.html" %}{% endblock %}

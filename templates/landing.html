@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Central Táxi Cone Sul{% endblock %}
+{% block body_class %}login-body{% endblock %}
+{% block content %}
+<div class="login-hero">
+  <div class="logo">🚕</div>
+  <h1 style="font-size:26px">Central Táxi Cone Sul</h1>
+  <p style="opacity:.85;margin-top:6px">App do cliente e painel da central</p>
+</div>
+<div class="page">
+  <a class="btn btn-primary btn-block" href="{{ url_for('login') }}">Login do cliente</a>
+  <a class="btn btn-green btn-block" href="{{ url_for('register') }}">Cadastrar cliente</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('admin_login') }}">Área do administrador</a>
+</div>
+{% endblock %}

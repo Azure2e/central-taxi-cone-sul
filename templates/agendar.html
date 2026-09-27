@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Agendar família{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Módulo familiar</div>
+  <h1>Agendar a casa</h1>
+</div>
+<div class="page" style="padding-bottom:28px">
+  <p class="hint">Uma corrida, um endereço, até <b>4 pessoas da mesma casa</b>.</p>
+  {% include "_leaflet_map.html" %}
+  <form method="post" id="form-familia" novalidate>
+    <div class="form-group">
+      <label>Rota</label>
+      <select name="route_id" id="route_id" required>
+        <option value="">Selecione</option>
+        {% for r in routes %}
+        <option value="{{ r.id }}" {% if form and form.get('route_id')==r.id|string %}selected{% endif %}>{{ r.label }} — R$ {{ '%.2f'|format(r.price) }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="row2">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" name="date" id="date" required value="{{ form.get('date','') if form else '' }}">
+      </div>
+      <div class="form-group">
+        <label>Horário</label>
+        <input type="time" name="time" id="time" required value="{{ form.get('time','') if form else '' }}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Endereço da casa (embarque)</label>
+      <input name="pickup_address" id="pickup_address" required minlength="8" value="{{ form.get('pickup_address', user.address or '') if form else (user.address or '') }}">
+    </div>
+    <div class="form-group">
+      <label>Identificação da casa</label>
+      <input name="house_label" value="{{ form.get('house_label', user.house_label or '') if form else (user.house_label or '') }}" placeholder="Casa da família...">
+    </div>
+
+    <h2 style="margin:8px 0 10px;font-size:16px">Passageiros da casa</h2>
+    <div class="person-box">
+      <h4>Pessoa 1 · quem solicita</h4>
+      <div class="form-group">
+        <label>Nome</label>
+        <input name="p1_name" id="p1_name" required value="{{ form.get('p1_name', user.name) if form else user.name }}">
+      </div>
+      <div class="row2">
+        <div class="form-group">
+          <label>WhatsApp com DDD</label>
+          <input name="p1_phone" id="p1_phone" required inputmode="numeric" value="{{ form.get('p1_phone', user.phone) if form else user.phone }}">
+        </div>
+        <div class="form-group">
+          <label>Documento (opcional)</label>
+          <input name="p1_doc" value="{{ form.get('p1_doc','') if form else '' }}" placeholder="RG / CPF">
+        </div>
+      </div>
+    </div>
+
+    {% for i in range(2,5) %}
+    <div class="person-box extra-person" id="pessoa-{{ i }}" hidden>
+      <h4>Pessoa {{ i }}</h4>
+      <div class="form-group">
+        <label>Nome</label>
+        <input name="p{{ i }}_name">
+      </div>
+      <div class="row2">
+        <div class="form-group">
+          <label>WhatsApp com DDD</label>
+          <input name="p{{ i }}_phone" inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label>Documento (opcional)</label>
+          <input name="p{{ i }}_doc" placeholder="RG / CPF">
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <button class="btn btn-ghost btn-block" type="button" id="btn-add-pessoa">+ Adicionar pessoa da casa</button>
+
+    <div class="form-group" style="margin-top:14px">
+      <label>Observações</label>
+      <textarea name="notes" placeholder="Cadeirinha, bagagem, portão...">{{ form.get('notes','') if form else '' }}</textarea>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn btn-green btn-block" type="submit">Confirmar agendamento</button>
+    </div>
+  </form>
+</div>
+<script>
+(function () {
+  var extras = Array.prototype.slice.call(document.querySelectorAll(".extra-person"));
+  var addBtn = document.getElementById("btn-add-pessoa");
+  var shown = 0;
+  if (addBtn) {
+    addBtn.addEventListener("click", function () {
+      if (shown >= extras.length) return;
+      extras[shown].hidden = false;
+      shown += 1;
+      if (shown >= extras.length) addBtn.textContent = "Limite de 4 pessoas";
+    });
+  }
+  var form = document.getElementById("form-familia");
+  if (!form) return;
+  function digits(v) { return String(v || "").replace(/\D/g, ""); }
+  function mark(el, ok) {
+    if (!el) return;
+    el.classList.toggle("invalid", !ok);
+  }
+  form.addEventListener("submit", function (ev) {
+    var ok = true;
+    var route = form.route_id;
+    var date = form.date;
+    var time = form.time;
+    var addr = form.pickup_address;
+    var name = form.p1_name;
+    var phone = form.p1_phone;
+    mark(route, !!route.value);
+    mark(date, !!date.value);
+    mark(time, !!time.value);
+    mark(addr, (addr.value || "").trim().length >= 8);
+    mark(name, (name.value || "").trim().length >= 3);
+    mark(phone, digits(phone.value).length >= 10);
+    if (!route.value || !date.value || !time.value) ok = false;
+    if ((addr.value || "").trim().length < 8) ok = false;
+    if ((name.value || "").trim().length < 3) ok = false;
+    if (digits(phone.value).length < 10) ok = false;
+    if (date.value && time.value) {
+      var when = new Date(date.value + "T" + time.value);
+      if (isNaN(when.getTime()) || when.getTime() < Date.now() - 5 * 60 * 1000) {
+        mark(date, false); mark(time, false); ok = false;
+      }
+    }
+    if (!ok) {
+      ev.preventDefault();
+      alert("Confira rota, data/hora futura, endereço e o WhatsApp de quem solicita.");
+    }
+  });
+})();
+</script>
+{% endblock %}
+{% block nav %}{% set tab='corridas' %}{% include "_nav_passenger.html" %}{% endblock %}

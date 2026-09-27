@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Rastreio encomenda #{{ p.id }}{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">{{ p.status }}</div>
+  <h1>Rastreio #{{ p.id }}</h1>
+</div>
+<div class="page">
+  {% include "_leaflet_map.html" %}
+  <p class="hint">{{ p.pickup_address }} → {{ p.delivery_address }}</p>
+  <p class="hint">{% if p.driver_name %}Táxi {{ p.driver_name }} · {{ p.plate }}{% else %}Aguardando taxista{% endif %}</p>
+  <p id="gps-info" class="hint">Atualizando posição...</p>
+  {% if p.recipient_phone %}
+  <a class="btn btn-green btn-block" href="https://wa.me/55{{ p.recipient_phone }}">WhatsApp de quem recebe</a>
+  {% endif %}
+  <a class="btn btn-ghost btn-block" href="{{ url_for('parcel_list') }}">Minhas encomendas</a>
+</div>
+<script>
+(function () {
+  var id = {{ p.id }};
+  function tick() {
+    fetch("/api/gps/encomenda/" + id).then(function (r) { return r.json(); }).then(function (d) {
+      var el = document.getElementById("gps-info");
+      if (!d.ok) { el.textContent = "Sem GPS ainda"; return; }
+      el.textContent = d.lat ? ("GPS " + Number(d.lat).toFixed(5) + ", " + Number(d.lng).toFixed(5) + " · " + (d.quando || "")) : "Taxista sem localização no momento";
+      if (d.lat && window.__coneMap) {
+        if (!window.__parcelPin) {
+          window.__parcelPin = L.marker([d.lat, d.lng]).addTo(window.__coneMap).bindPopup("Encomenda");
+        } else {
+          window.__parcelPin.setLatLng([d.lat, d.lng]);
+        }
+      }
+    }).catch(function () {});
+  }
+  tick();
+  setInterval(tick, 8000);
+})();
+</script>
+{% endblock %}
+{% block nav %}{% set tab='encomenda' %}{% include "_nav_passenger.html" %}{% endblock %}

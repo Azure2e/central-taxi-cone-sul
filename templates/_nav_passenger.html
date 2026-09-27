@@ -1,0 +1,17 @@
+<nav class="nav">
+  <a href="{{ url_for('passenger_home') }}" class="{{ 'active' if tab=='inicio' }}">
+    <span>🚕</span>Início{% if unread_notes %}<sup>{{ unread_notes }}</sup>{% endif %}
+  </a>
+  <a href="{{ url_for('passenger_routes') }}" class="{{ 'active' if tab=='rotas' }}">
+    <span>🔀</span>Rotas
+  </a>
+  <a href="{{ url_for('passenger_rides') }}" class="{{ 'active' if tab=='corridas' }}">
+    <span>📋</span>Corridas
+  </a>
+  <a href="{{ url_for('parcel_list') }}" class="{{ 'active' if tab=='encomenda' }}">
+    <span>📦</span>Encomenda
+  </a>
+  <a href="{{ url_for('passenger_profile') }}" class="{{ 'active' if tab=='perfil' }}">
+    <span>👤</span>Perfil
+  </a>
+</nav>

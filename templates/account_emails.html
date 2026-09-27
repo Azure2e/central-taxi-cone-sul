@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}E-mails da conta{% endblock %}
+{% block extra_css %}
+{% if user and user.role=='admin' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endif %}
+{% endblock %}
+{% block body_class %}{{ 'admin-body' if user and user.role=='admin' else '' }}{% endblock %}
+{% block shell_class %}{{ 'admin-shell admin-list-page' if user and user.role=='admin' else '' }}{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Conta</div>
+  <h1>E-mail e recuperação</h1>
+</div>
+<div class="page">
+  <p class="hint">O e-mail principal serve para entrar. O de recuperação recebe o link se a senha for esquecida — use outro endereço, de preferência de um familiar.</p>
+  <form method="post">
+    <div class="form-group">
+      <label>E-mail de login</label>
+      <input type="email" name="email" value="{{ user.email or '' }}" placeholder="voce@email.com">
+    </div>
+    <div class="form-group">
+      <label>E-mail de recuperação</label>
+      <input type="email" name="recovery_email" value="{{ user.recovery_email or '' }}" placeholder="outro@email.com">
+    </div>
+    <div class="form-group">
+      <label>Senha atual (confirmação)</label>
+      <input type="password" name="password" required>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Salvar e-mails</button>
+  </form>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('home') }}" style="margin-top:10px">Voltar</a>
+</div>
+{% endblock %}

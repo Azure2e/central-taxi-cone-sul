@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Lembretes do app{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Notificações</div>
+  <h1>Lembretes automáticos</h1>
+</div>
+<div class="page">
+  <p class="hint">CNH vencendo/vencida e antecedentes pendentes entram sozinhos aqui e no app do taxista.</p>
+  {% if not notes %}
+    <div class="list-empty">Nenhum lembrete no momento.</div>
+  {% endif %}
+  {% for n in notes %}
+  <div class="card">
+    <strong>{{ n.title }}</strong>
+    <p style="margin-top:6px">{{ n.body }}</p>
+    <p class="sub">{{ n.created_at }} · {{ n.kind }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='mot' %}{% include "_nav_admin.html" %}{% endblock %}

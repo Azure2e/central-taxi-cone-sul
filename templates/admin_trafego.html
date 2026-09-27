@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Origem do tráfego{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block content %}
+<div class="topbar"><div class="brand-sub">Analytics</div><h1>De onde veio o acesso</h1></div>
+<div class="page">
+  <p class="hint">UTM, indicação e site de origem. O cookie guarda o primeiro toque por 30 dias.</p>
+  {% for h in hits %}
+  <div class="card">
+    <strong>{{ h.utm_source or 'direto' }}</strong>
+    <div class="sub">{{ h.created_at }} · {{ h.path }} · IP {{ h.ip }}</div>
+    <div class="hint">{{ h.utm_medium or '-' }} / {{ h.utm_campaign or '-' }}</div>
+    {% if h.http_referrer %}<div class="hint" style="word-break:break-all">{{ h.http_referrer }}</div>{% endif %}
+  </div>
+  {% else %}
+  <div class="list-empty">Nenhum acesso rastreado ainda.</div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='sec' %}{% include "_nav_admin.html" %}{% endblock %}

@@ -1,0 +1,176 @@
+html[data-theme="auto"] {
+  --navy: #0f3d3e;
+  --navy-2: #1a6a63;
+  --navy-dark: #082426;
+  --gold: #f4a261;
+  --yellow: #ffd166;
+  --green: #2a9d8f;
+  --green-soft: #d8f3ef;
+  --orange: #e76f51;
+  --orange-soft: #ffe8e1;
+  --red: #c1121f;
+  --red-soft: #fde2e4;
+  --bg: #f6efe6;
+  --card: #fffdf9;
+  --text: #1b2424;
+  --muted: #5c6b6b;
+  --line: #eadfce;
+}
+@media (prefers-color-scheme: dark) {
+  html[data-theme="auto"] {
+    --navy: #0b1220;
+    --navy-2: #1e3a5f;
+    --navy-dark: #060b14;
+    --gold: #38bdf8;
+    --yellow: #7dd3fc;
+    --green: #22c55e;
+    --green-soft: #14532d;
+    --orange: #fb7185;
+    --orange-soft: #4c1d24;
+    --red: #f43f5e;
+    --red-soft: #4c0519;
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --line: #334155;
+  }
+  html[data-theme="auto"] body,
+  html[data-theme="auto"] .shell,
+  html[data-theme="auto"] .card,
+  html[data-theme="auto"] .soft-card,
+  html[data-theme="auto"] .fleet-card { background: var(--card); color: var(--text); }
+}
+
+/* Temas — personalize as variáveis aqui */
+
+html[data-theme="amazonia"] {
+  --navy: #0f3d3e;
+  --navy-2: #1a6a63;
+  --navy-dark: #082426;
+  --gold: #f4a261;
+  --yellow: #ffd166;
+  --green: #2a9d8f;
+  --green-soft: #d8f3ef;
+  --orange: #e76f51;
+  --orange-soft: #ffe8e1;
+  --red: #c1121f;
+  --red-soft: #fde2e4;
+  --bg: #f6efe6;
+  --card: #fffdf9;
+  --text: #1b2424;
+  --muted: #5c6b6b;
+  --line: #eadfce;
+}
+
+html[data-theme="noite"] {
+  --navy: #0b1220;
+  --navy-2: #1e3a5f;
+  --navy-dark: #060b14;
+  --gold: #38bdf8;
+  --yellow: #7dd3fc;
+  --green: #22c55e;
+  --green-soft: #dcfce7;
+  --orange: #fb7185;
+  --orange-soft: #ffe4e6;
+  --red: #f43f5e;
+  --red-soft: #ffe4e6;
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --line: #334155;
+}
+
+html[data-theme="ouro"] {
+  --navy: #1c1917;
+  --navy-2: #44403c;
+  --navy-dark: #0c0a09;
+  --gold: #f5c518;
+  --yellow: #ffe566;
+  --green: #65a30d;
+  --green-soft: #ecfccb;
+  --orange: #d97706;
+  --orange-soft: #fef3c7;
+  --red: #b91c1c;
+  --red-soft: #fee2e2;
+  --bg: #fffbeb;
+  --card: #fffdf5;
+  --text: #1c1917;
+  --muted: #78716c;
+  --line: #fde68a;
+}
+
+html[data-theme="violeta"] {
+  --navy: #3b0764;
+  --navy-2: #6d28d9;
+  --navy-dark: #1e0533;
+  --gold: #f0abfc;
+  --yellow: #f5d0fe;
+  --green: #34d399;
+  --green-soft: #d1fae5;
+  --orange: #fb7185;
+  --orange-soft: #ffe4e6;
+  --red: #e11d48;
+  --red-soft: #ffe4e6;
+  --bg: #faf5ff;
+  --card: #ffffff;
+  --text: #2e1065;
+  --muted: #7e22ce;
+  --line: #e9d5ff;
+}
+
+html[data-theme="claro"] {
+  --navy: #0f172a;
+  --navy-2: #334155;
+  --navy-dark: #020617;
+  --gold: #0ea5e9;
+  --yellow: #38bdf8;
+  --green: #16a34a;
+  --green-soft: #dcfce7;
+  --orange: #ea580c;
+  --orange-soft: #ffedd5;
+  --red: #dc2626;
+  --red-soft: #fee2e2;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+}
+
+html[data-theme="noite"] body,
+html[data-theme="noite"] .shell,
+html[data-theme="noite"] .card,
+html[data-theme="noite"] .soft-card,
+html[data-theme="noite"] .fleet-card {
+  background: var(--card);
+  color: var(--text);
+}
+
+.topbar, .login-hero, .admin-hero {
+  background: linear-gradient(160deg, var(--navy-dark), var(--navy), var(--navy-2)) !important;
+  color: #fff;
+}
+.btn-primary { background: var(--navy-2) !important; border-color: var(--navy-2) !important; color: #fff !important; }
+.btn-green { background: var(--green) !important; color: #fff !important; }
+
+
+html[data-theme="uber"] {
+  --navy: #000000;
+  --navy-2: #1f1f1f;
+  --navy-dark: #000000;
+  --gold: #06C167;
+  --yellow: #06C167;
+  --green: #06C167;
+  --green-soft: #e6f9ef;
+  --orange: #ff5a1f;
+  --orange-soft: #ffe8df;
+  --red: #e11900;
+  --red-soft: #ffe5e2;
+  --bg: #f6f6f6;
+  --card: #ffffff;
+  --text: #000000;
+  --muted: #6b6b6b;
+  --line: #e5e5e5;
+}

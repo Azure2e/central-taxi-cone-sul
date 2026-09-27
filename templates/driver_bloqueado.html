@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Bloqueado{% endblock %}
+{% block content %}
+<div class="topbar">
+  <h1>Acesso bloqueado</h1>
+</div>
+<div class="page">
+  <div class="card">
+    <p>Olá, <b>{{ drv.name }}</b>. Seu cadastro está bloqueado pela central.</p>
+    <p class="hint" style="margin-top:8px">
+      Situação da mensalidade: <b>{{ drv.payment_status }}</b>.
+      Regularize com o administrador Beto para voltar a receber corridas.
+    </p>
+  </div>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('logout') }}">Sair</a>
+</div>
+{% endblock %}

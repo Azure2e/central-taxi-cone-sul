@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Verificação em duas etapas{% endblock %}
+{% block content %}
+<div class="login-hero">
+  <div class="logo">🔐</div>
+  <h1 style="font-size:24px">Segundo fator</h1>
+  <p style="opacity:.85;margin-top:6px;font-size:14px">Abra o Google Authenticator, Authy ou similar</p>
+</div>
+<div class="page">
+  <form method="post">
+    <input type="hidden" name="csrf" value="{{ pending_csrf or '' }}">
+    <div class="form-group">
+      <label>Código de 6 dígitos</label>
+      <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="16" placeholder="000 000" required autofocus>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Confirmar 2FA</button>
+  </form>
+  <p class="hint" style="margin-top:12px">Se perdeu o celular, use um código de recuperação salvo quando o 2FA foi ativado.</p>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('logout') }}">Cancelar</a>
+</div>
+{% endblock %}

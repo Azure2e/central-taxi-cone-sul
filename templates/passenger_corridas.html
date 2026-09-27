@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Minhas corridas{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Histórico</div>
+  <h1>Corridas</h1>
+</div>
+<div class="page">
+  <a class="btn btn-green btn-block" href="{{ url_for('schedule_ride') }}" style="margin-bottom:14px">+ Agendar família (até 4)</a>
+  {% if not rides %}
+    <div class="list-empty">Nenhuma corrida ainda.</div>
+  {% endif %}
+  {% for c in rides %}
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+      <div>
+        <strong>{{ c.route_label }}</strong>
+        <p class="sub">{{ c.kind }} · {{ c.created_at }}</p>
+      </div>
+      <span class="badge
+        {% if c.status=='pendente' %}orange
+        {% elif c.status in ['aceita','a_caminho','em_andamento'] %}blue
+        {% elif c.status=='concluida' %}green
+        {% else %}gray{% endif %}">{{ c.status.replace('_',' ') }}</span>
+    </div>
+    <p style="margin-top:8px;font-size:13px">📍 {{ c.pickup_address }}</p>
+    {% if c.house_label %}<p class="sub">🏠 {{ c.house_label }}</p>{% endif %}
+    {% if c.scheduled_at %}<p class="sub">🗓️ {{ c.scheduled_at }}</p>{% endif %}
+    {% if c.driver_name %}<p class="sub">🚕 {{ c.driver_name }} · {{ c.plate }}</p>{% endif %}
+    <p style="margin-top:6px;font-weight:700">R$ {{ '%.2f'|format(c.price) }} · {{ c.seats }} assento(s)</p>
+    {% set folks = people_map.get(c.id, []) %}
+    {% if folks %}
+      <div class="pill-row">
+        {% for p in folks %}
+          <span class="chip">{{ p.name }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% if c.status in ['pendente','aceita'] %}
+      <form method="post" action="{{ url_for('cancel_ride', ride_id=c.id) }}">
+        <button class="btn btn-ghost btn-sm" type="submit">Cancelar</button>
+      </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='corridas' %}{% include "_nav_passenger.html" %}{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Cadastro{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="topbar-row">
+    <div class="brand-mark">🚕</div>
+    <div>
+      <div class="brand-sub">Passageiro</div>
+      <div class="brand-title">Criar conta</div>
+    </div>
+  </div>
+</div>
+<div class="page">
+  <p class="hint">Cadastre a casa da família para agendar até 4 pessoas na mesma corrida.</p>
+  <form method="post">
+    <div class="form-group">
+      <label>Nome completo</label>
+      <input name="name" required>
+    </div>
+    <div class="form-group">
+      <label>E-mail (login)</label>
+      <input name="email" type="email" required placeholder="voce@email.com">
+    </div>
+    <div class="form-group">
+      <label>E-mail de recuperação</label>
+      <input name="recovery_email" type="email" placeholder="outro@email.com">
+    </div>
+    <div class="form-group">
+      <label>Telefone (WhatsApp)</label>
+      <input name="phone" type="tel" required>
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input name="password" type="password" minlength="4" required>
+    </div>
+    <div class="form-group">
+      <label>Código de quem indicou (os dois ganham)</label>
+      <input name="ref" value="{{ ref or '' }}" placeholder="Ex.: ANA001">
+    </div>
+    <div class="form-group">
+      <label>Endereço da casa</label>
+      <input name="address" placeholder="Rua, número, bairro — cidade">
+    </div>
+    <div class="form-group">
+      <label>Como chama a casa?</label>
+      <input name="house_label" placeholder="Ex.: Casa da família Souza">
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Cadastrar</button>
+  </form>
+  <p style="text-align:center;margin-top:14px"><a href="{{ url_for('login') }}">Já tenho conta</a></p>
+</div>
+{% endblock %}

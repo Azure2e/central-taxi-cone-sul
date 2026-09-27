@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Central Táxi Cone Sul</div>
+  <h1>{{ code }}</h1>
+</div>
+<div class="page">
+  <div class="card">
+    <strong>{{ title }}</strong>
+    <p class="hint" style="margin-top:8px">{{ text }}</p>
+  </div>
+  <a class="btn btn-primary btn-block" href="{{ url_for('login') }}">Entrar no app</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('admin_login') }}">Área do administrador</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('pwa_lab') }}">Teste PWA</a>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Despacho — Corridas{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Mesa de despacho · ao vivo {{ agora }}</div>
+  <h1>Corridas da central</h1>
+</div>
+<div class="page">
+  <div class="kpi-grid stagger">
+    <div class="kpi blush"><div class="k">Na fila</div><div class="n">{{ stats.fila or 0 }}</div><div class="s">aguardando taxista</div></div>
+    <div class="kpi sky"><div class="k">Em curso</div><div class="n">{{ stats.curso or 0 }}</div><div class="s">aceita / a caminho</div></div>
+    <div class="kpi gold"><div class="k">Família</div><div class="n">{{ stats.familia or 0 }}</div><div class="s">casas agendadas</div></div>
+    <div class="kpi mint"><div class="k">Concluídas</div><div class="n">{{ stats.feitas or 0 }}</div><div class="s">já feitas</div></div>
+  </div>
+  {% include "_leaflet_map.html" %}
+
+  <form method="get" class="fleet-filter">
+    <select name="sit">
+      <option value="">Todas as situações</option>
+      {% for s in ['pendente','aceita','a_caminho','em_andamento','concluida','cancelada'] %}
+      <option value="{{ s }}" {% if sit==s %}selected{% endif %}>{{ s.replace('_',' ') }}</option>
+      {% endfor %}
+    </select>
+    <div class="row2">
+      <select name="tipo">
+        <option value="">Imediata e família</option>
+        <option value="agendada" {% if tipo=='agendada' %}selected{% endif %}>Só família</option>
+        <option value="imediata" {% if tipo=='imediata' %}selected{% endif %}>Só imediata</option>
+      </select>
+      <select name="rota">
+        <option value="">Todas as rotas</option>
+        {% for r in routes %}
+        <option value="{{ r.id }}" {% if rota==r.id|string %}selected{% endif %}>{{ r.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Filtrar fila</button>
+  </form>
+
+  <p class="hint">{{ stats.total or 0 }} corrida(s) no banco · {{ rides|length }} neste filtro · atualiza sozinha</p>
+  {% if not rides %}
+    <div class="list-empty">
+      Nenhuma corrida neste filtro. Elas entram aqui quando o cliente pede imediata ou agenda a família.
+    </div>
+  {% endif %}
+  
+
+  {% for c in rides %}
+  <article class="fleet-card">
+    <header>
+      <div class="grow">
+        <strong>#{{ c.id }} · {{ c.route_label }}</strong>
+        <div class="sub">{{ c.passenger_name }} · {{ c.phone_fmt }}</div>
+      </div>
+      <div class="fleet-flags">
+        {% if c.kind=='agendada' %}<span class="badge orange">Família · {{ c.seats }}</span>
+        {% else %}<span class="badge blue">Imediata</span>{% endif %}
+        <span class="badge {{ 'orange' if c.status=='pendente' else 'green' if c.status=='concluida' else 'gray' if c.status=='cancelada' else 'blue' }}">{{ c.status.replace('_',' ') }}</span>
+      </div>
+    </header>
+    <ul class="fleet-meta">
+      <li>📍 {{ c.pickup_address }}</li>
+      {% if c.house_label %}<li>🏠 {{ c.house_label }}</li>{% endif %}
+      {% if c.when_fmt %}<li>🗓️ {{ c.when_fmt }}</li>{% endif %}
+      <li>💵 R$ {{ '%.2f'|format(c.price or 0) }}</li>
+      {% if c.driver_name %}<li>🚕 {{ c.driver_name }} · {{ c.plate or '' }}</li>
+      {% else %}<li>🚕 Sem taxista ainda</li>{% endif %}
+    </ul>
+    {% set folks = people_map.get(c.id, []) %}
+    {% if folks %}
+    <div class="pill-row" style="margin-top:8px">
+      {% for p in folks %}<span class="chip">{{ p.name }}</span>{% endfor %}
+    </div>
+    {% endif %}
+    <div class="actions" style="margin-top:10px">
+      {% if c.wa %}
+      <a class="btn btn-green btn-sm" href="https://wa.me/55{{ c.wa }}" target="_blank" rel="noopener">WhatsApp</a>
+      {% endif %}
+      {% if c.status=='pendente' %}
+      <form method="post" action="{{ url_for('admin_dispatch', ride_id=c.id) }}" class="ops-form" style="flex:1">
+        <select name="driver_id" required>
+          <option value="">Taxista livre na rota</option>
+          {% for d in livres_by_route.get(c.route_id, []) %}
+          <option value="{{ d.id }}">{{ d.name }} · {{ d.plate }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-primary btn-sm" type="submit">Despachar</button>
+      </form>
+      <form method="post" action="{{ url_for('admin_cancel_ride', ride_id=c.id) }}" onsubmit="return confirm('Cancelar esta corrida?')">
+        <button class="btn btn-ghost btn-sm" type="submit">Cancelar</button>
+      </form>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='rides' %}{% include "_nav_admin.html" %}{% endblock %}

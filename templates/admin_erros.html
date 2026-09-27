@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Monitor de erros{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Monitor</div>
+  <h1>Logs de erros</h1>
+</div>
+<div class="page">
+  <div class="kpi-grid stagger">
+    <div class="kpi blush">
+      <div class="k">Abertos</div>
+      <div class="n">{{ stats.abertos or 0 }}</div>
+      <div class="s">ainda sem resolução</div>
+    </div>
+    <div class="kpi gold">
+      <div class="k">Críticos</div>
+      <div class="n">{{ stats.criticos or 0 }}</div>
+      <div class="s">abertos agora</div>
+    </div>
+    <div class="kpi sky">
+      <div class="k">24 horas</div>
+      <div class="n">{{ stats.dia or 0 }}</div>
+      <div class="s">novos registros</div>
+    </div>
+    <div class="kpi mint">
+      <div class="k">Total</div>
+      <div class="n">{{ stats.total or 0 }}</div>
+      <div class="s">histórico</div>
+    </div>
+  </div>
+
+  <div class="soft-card">
+    <h2 style="font-size:16px;margin-bottom:8px">Alertas críticos</h2>
+    <p class="hint">Erro <b>crit</b> avisa no painel, por e-mail, Slack e Microsoft Teams. O mesmo intervalo mínimo vale para todos os canais.</p>
+    <form method="post" action="{{ url_for('admin_alert_config') }}">
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="alert_crit_enabled" value="1" {% if cfg.get('alert_crit_enabled','1')=='1' %}checked{% endif %}>
+          Ativar alertas críticos
+        </label>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="alert_notify_admins" value="1" {% if cfg.get('alert_notify_admins','1')=='1' %}checked{% endif %}>
+          Avisar e-mail dos administradores
+        </label>
+      </div>
+      <div class="form-group">
+        <label>E-mail extra de plantão</label>
+        <input type="email" name="alert_email" value="{{ cfg.get('alert_email','') }}" placeholder="plantao@conesul.taxi">
+      </div>
+      <div class="form-group">
+        <label>Intervalo mínimo entre alertas (minutos)</label>
+        <input name="alert_cooldown_min" type="number" min="1" value="{{ cfg.get('alert_cooldown_min','15') }}">
+      </div>
+      <hr style="border:0;border-top:1px solid #e2e8f0;margin:12px 0">
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="slack_enabled" value="1" {% if cfg.get('slack_enabled')=='1' %}checked{% endif %}>
+          Slack
+        </label>
+      </div>
+      <div class="form-group">
+        <label>Webhook Incoming do Slack</label>
+        <input name="slack_webhook" type="url" placeholder="{% if cfg.get('slack_webhook') %}https://hooks.slack.com/... (salvo){% else %}https://hooks.slack.com/services/...{% endif %}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="teams_enabled" value="1" {% if cfg.get('teams_enabled')=='1' %}checked{% endif %}>
+          Microsoft Teams
+        </label>
+      </div>
+      <div class="form-group">
+        <label>Webhook Incoming do Teams</label>
+        <input name="teams_webhook" type="url" placeholder="{% if cfg.get('teams_webhook') %}https://...office.com/webhookb2/... (salvo){% else %}https://outlook.office.com/webhook/...{% endif %}" autocomplete="off">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Salvar alertas</button>
+    </form>
+    <form method="post" action="{{ url_for('admin_alert_test') }}" style="margin-top:8px">
+      <button class="btn btn-green btn-block" type="submit">Disparar alerta de teste</button>
+    </form>
+  </div>
+
+  <form method="get" class="soft-card">
+    <div class="row2">
+      <div class="form-group">
+        <label>Nível</label>
+        <select name="level">
+          <option value="">Todos</option>
+          {% for lv in ['warn','error','crit'] %}
+          <option value="{{ lv }}" {% if level==lv %}selected{% endif %}>{{ lv }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Origem</label>
+        <select name="source">
+          <option value="">Todas</option>
+          {% for s in sources %}
+          <option value="{{ s.source }}" {% if source==s.source %}selected{% endif %}>{{ s.source }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Situação</label>
+      <select name="abertos">
+        <option value="1" {% if only_open %}selected{% endif %}>Só abertos</option>
+        <option value="0" {% if not only_open %}selected{% endif %}>Todos</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit" style="margin-top:10px">Filtrar</button>
+  </form>
+
+  {% if only_open and (stats.abertos or 0) > 0 %}
+  <form method="post" action="{{ url_for('admin_resolve_all_errors') }}" style="margin-bottom:10px">
+    <button class="btn btn-ghost btn-block" type="submit">Marcar todos como resolvidos</button>
+  </form>
+  {% endif %}
+
+  {% if not rows %}
+    <div class="soft-card list-empty">Nenhum erro neste filtro.</div>
+  {% endif %}
+  {% for e in rows %}
+  <div class="queue-card">
+    <div class="top">
+      <strong>#{{ e.id }} · {{ e.source }}</strong>
+      <span class="tag {{ 'fam' if e.level in ['error','crit'] else '' }}">{{ e.level }}</span>
+    </div>
+    <p>{{ e.message }}</p>
+    <p class="sub">{{ e.created_at }} · {{ e.path }} · IP {{ e.ip or '-' }}</p>
+    {% if e.detail %}
+    <pre style="white-space:pre-wrap;font-size:11px;background:#f8fafc;padding:8px;border-radius:10px;margin-top:8px;max-height:140px;overflow:auto">{{ e.detail[:1200] }}</pre>
+    {% endif %}
+    {% if not e.resolved %}
+    <form method="post" action="{{ url_for('admin_resolve_error', error_id=e.id) }}" style="margin-top:8px">
+      <button class="btn btn-green btn-sm" type="submit">Resolver</button>
+    </form>
+    {% else %}
+    <p class="sub">Resolvido</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+  <h2 style="font-size:16px;margin:16px 0 8px">Alertas disparados</h2>
+  {% for a in sent_alerts or [] %}
+  <div class="queue-card">
+    <div class="top">
+      <strong>{{ a.source }}</strong>
+      <span class="tag">{{ a.status }}</span>
+    </div>
+    <p>{{ a.message }}</p>
+    <p class="sub">{{ a.created_at }} · {{ a.destination or 'sem e-mail' }}</p>
+  </div>
+  {% endfor %}
+  <p class="hint">Arquivo: {{ log_file }}</p>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('admin_security') }}">Voltar à segurança</a>
+</div>
+{% endblock %}
+{% block nav %}{% set tab='sec' %}{% include "_nav_admin.html" %}{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Minhas encomendas{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Entrega</div>
+  <h1>Minhas encomendas</h1>
+</div>
+<div class="page">
+  <a class="btn btn-green btn-block" href="{{ url_for('parcel_new') }}">Nova encomenda</a>
+  {% for p in parcels %}
+  <div class="card">
+    <strong>#{{ p.id }} · {{ p.route_label }}</strong>
+    <div class="sub">{{ p.status }} · R$ {{ '%.2f'|format(p.price or 0) }} · {{ p.size }}</div>
+    <p class="hint">De {{ p.pickup_address }} → {{ p.delivery_address }}</p>
+    <p class="hint">Recebe: {{ p.recipient_name }} {{ p.recipient_phone }}</p>
+    {% if p.driver_name %}<p class="hint">Táxi: {{ p.driver_name }}</p>{% endif %}
+    <a class="btn btn-primary btn-sm" href="{{ url_for('parcel_track', pid=p.id) }}">Rastrear ao vivo</a>
+  </div>
+  {% else %}
+  <p class="hint">Nenhuma encomenda ainda.</p>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='corridas' %}{% include "_nav_passenger.html" %}{% endblock %}

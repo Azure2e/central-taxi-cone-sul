@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block title %}Segurança{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Central de segurança</div>
+  <h1>Controle de acesso</h1>
+</div>
+<div class="page">
+  <div class="kpi-grid stagger">
+    <div class="kpi mint">
+      <div class="k">Logins 24h</div>
+      <div class="n">{{ ok_24h }}</div>
+      <div class="s">acessos válidos</div>
+    </div>
+    <div class="kpi blush">
+      <div class="k">Falhas 24h</div>
+      <div class="n">{{ fails_24h }}</div>
+      <div class="s">tentativas barradas</div>
+    </div>
+    <div class="kpi sky">
+      <div class="k">Sessão</div>
+      <div class="n">{{ cfg.get('session_minutes', '45') }}</div>
+      <div class="s">minutos de inatividade</div>
+    </div>
+    <div class="kpi gold">
+      <div class="k">Bloqueio</div>
+      <div class="n">{{ cfg.get('max_fails', '5') }}</div>
+      <div class="s">erros → {{ cfg.get('lock_minutes', '15') }} min</div>
+    </div>
+  </div>
+
+  <form method="get" class="fleet-filter">
+    <input name="q" value="{{ q }}" placeholder="Nome, telefone ou e-mail">
+    <select name="perfil">
+      <option value="">Todos os perfis</option>
+      <option value="admin" {% if perfil=='admin' %}selected{% endif %}>Admin ({{ counts.admins or 0 }})</option>
+      <option value="motorista" {% if perfil=='motorista' %}selected{% endif %}>Motorista ({{ counts.motoristas or 0 }})</option>
+      <option value="passageiro" {% if perfil=='passageiro' %}selected{% endif %}>Passageiro ({{ counts.passageiros or 0 }})</option>
+    </select>
+    <button class="btn btn-primary btn-block" type="submit">Filtrar contas</button>
+  </form>
+  <p class="hint">{{ users|length }} conta(s) · 2FA ativo em {{ counts.com_2fa or 0 }}</p>
+
+  <details class="soft-card">
+    <summary style="font-weight:800;color:#0b3a66">Política da central</summary>
+    <form method="post" action="{{ url_for('admin_security_config') }}" style="margin-top:12px">
+      <div class="row2">
+        <div class="form-group">
+          <label>Tentativas até bloquear</label>
+          <input name="max_fails" type="number" min="2" value="{{ cfg.get('max_fails', 5) }}">
+        </div>
+        <div class="form-group">
+          <label>Minutos de bloqueio</label>
+          <input name="lock_minutes" type="number" min="1" value="{{ cfg.get('lock_minutes', 15) }}">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="form-group">
+          <label>Sessão (minutos)</label>
+          <input name="session_minutes" type="number" min="5" value="{{ cfg.get('session_minutes', 45) }}">
+        </div>
+        <div class="form-group">
+          <label>Senha mínima</label>
+          <input name="min_password" type="number" min="4" value="{{ cfg.get('min_password', 6) }}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="require_2fa_admin" value="1" {% if cfg.get('require_2fa_admin')=='1' %}checked{% endif %}>
+          Exigir 2FA para administradores
+        </label>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Salvar política</button>
+    </form>
+    <a class="btn btn-primary btn-block" href="{{ url_for('admin_errors') }}" style="margin-top:8px">
+      ⚠ Monitor de erros ({{ err_open or 0 }} abertos · {{ err_24h or 0 }} em 24h)
+    </a>
+    <a class="btn btn-green btn-block" href="{{ url_for('totp_setup') }}" style="margin-top:8px">Configurar meu 2FA</a>
+    <a class="btn btn-ghost btn-block" href="{{ url_for('account_emails') }}" style="margin-top:8px">E-mail e recuperação</a>
+    <a class="btn btn-ghost btn-block" href="{{ url_for('change_password') }}" style="margin-top:8px">Trocar minha senha</a>
+    <a class="btn btn-ghost btn-block" href="{{ url_for('admin_config') }}" style="margin-top:8px">Abrir configurações de rotas</a>
+  </details>
+
+  <details class="soft-card">
+    <summary style="font-weight:800;color:#0b3a66">Serviço SMTP real</summary>
+    <p class="hint">Gmail: smtp.gmail.com · 587 · STARTTLS (senha de app). Outlook: smtp.office365.com · 587.</p>
+    <form method="post" action="{{ url_for('admin_smtp_config') }}">
+      <div class="form-group">
+        <label style="display:flex;gap:8px;align-items:center">
+          <input type="checkbox" name="smtp_enabled" value="1" {% if cfg.get('smtp_enabled')=='1' %}checked{% endif %}>
+          Ativar envio real
+        </label>
+      </div>
+      <div class="form-group">
+        <label>Servidor</label>
+        <input name="smtp_host" value="{{ cfg.get('smtp_host','') }}" placeholder="smtp.gmail.com">
+      </div>
+      <div class="row2">
+        <div class="form-group">
+          <label>Porta</label>
+          <input name="smtp_port" value="{{ cfg.get('smtp_port','587') }}">
+        </div>
+        <div class="form-group">
+          <label>Segurança</label>
+          <select name="smtp_security">
+            <option value="starttls" {% if cfg.get('smtp_security','starttls')=='starttls' %}selected{% endif %}>STARTTLS (587)</option>
+            <option value="ssl" {% if cfg.get('smtp_security')=='ssl' %}selected{% endif %}>SSL (465)</option>
+            <option value="none" {% if cfg.get('smtp_security')=='none' %}selected{% endif %}>Nenhuma</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Usuário SMTP</label>
+        <input name="smtp_user" value="{{ cfg.get('smtp_user','') }}" placeholder="seu@gmail.com" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Senha / senha de app</label>
+        <input type="password" name="smtp_pass" placeholder="{% if cfg.get('smtp_pass') %}•••••• salva — preencha só para trocar{% else %}cole a senha{% endif %}" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>Remetente (From)</label>
+        <input name="smtp_from" value="{{ cfg.get('smtp_from','nao-responda@conesul.taxi') }}">
+      </div>
+      <div class="form-group">
+        <label>Nome do remetente</label>
+        <input name="smtp_from_name" value="{{ cfg.get('smtp_from_name','Central Taxi Cone Sul') }}">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Salvar SMTP</button>
+    </form>
+    <form method="post" action="{{ url_for('admin_smtp_test') }}" style="margin-top:10px">
+      <div class="form-group">
+        <label>Enviar teste para</label>
+        <input type="email" name="test_email" value="{{ user.email or user.recovery_email or '' }}" required>
+      </div>
+      <button class="btn btn-green btn-block" type="submit">Validar envio de teste</button>
+    </form>
+  </details>
+
+  {% if locked %}
+  <h2 style="font-size:16px;margin:16px 0 8px">Contas sob restrição</h2>
+  {% for u in locked %}
+  <div class="soft-card">
+    <strong>{{ u.name }}</strong>
+    <p class="sub">{{ u.phone }} · {{ u.role }} · falhas {{ u.failed_logins or 0 }}</p>
+    {% if not u.active %}<span class="pill off">Desativada</span>{% endif %}
+    {% if u.locked_until %}<span class="pill wait">Lock {{ u.locked_until }}</span>{% endif %}
+    <div class="actions" style="margin-top:8px">
+      <form method="post" action="{{ url_for('admin_activate_user', user_id=u.id) }}">
+        <button class="btn btn-green btn-sm">Reativar</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  <h2 style="font-size:16px;margin:16px 0 8px">Contas</h2>
+  {% for u in users %}
+  <article class="fleet-card">
+    <header>
+      <div class="grow">
+        <strong>{{ u.name }}</strong>
+        <div class="sub">{{ u.phone_fmt }} · {{ u.role }}{% if u.email %} · {{ u.email }}{% endif %}</div>
+      </div>
+      <div class="fleet-flags">
+        {% if u.totp_enabled %}<span class="badge green">2FA</span>{% else %}<span class="badge gray">sem 2FA</span>{% endif %}
+        {% if u.active %}<span class="badge blue">Ativa</span>{% else %}<span class="badge red">Off</span>{% endif %}
+      </div>
+    </header>
+    <ul class="fleet-meta">
+      <li>🕒 {{ u.last_fmt }}{% if u.last_login_ip %} · IP {{ u.last_login_ip }}{% endif %}</li>
+      {% if u.failed_logins %}<li>⚠ {{ u.failed_logins }} falha(s) de senha</li>{% endif %}
+    </ul>
+    <div class="actions">
+      {% if u.active %}
+      <form method="post" action="{{ url_for('admin_deactivate_user', user_id=u.id) }}">
+        <button class="btn btn-red btn-sm" type="submit">Desativar</button>
+      </form>
+      {% else %}
+      <form method="post" action="{{ url_for('admin_activate_user', user_id=u.id) }}">
+        <button class="btn btn-green btn-sm" type="submit">Reativar</button>
+      </form>
+      {% endif %}
+      <form method="post" action="{{ url_for('admin_reset_password', user_id=u.id) }}" onsubmit="return confirm('Gerar senha temporária para {{ u.name }}?')">
+        <button class="btn btn-ghost btn-sm" type="submit">Nova senha</button>
+      </form>
+      {% if u.totp_enabled %}
+      <form method="post" action="{{ url_for('admin_reset_2fa', user_id=u.id) }}">
+        <button class="btn btn-ghost btn-sm" type="submit">Reset 2FA</button>
+      </form>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+
+  <h2 style="font-size:16px;margin:16px 0 8px">Tentativas de login</h2>
+  {% for a in attempts %}
+  <div class="queue-card">
+    <div class="top">
+      <strong>{{ a.phone }}</strong>
+      <span class="tag {{ '' if a.success else 'fam' }}">{{ 'ok' if a.success else a.reason }}</span>
+    </div>
+    <p>{{ a.created_at }} · IP {{ a.ip }}</p>
+  </div>
+  {% endfor %}
+
+  <h2 style="font-size:16px;margin:16px 0 8px">E-mails enviados</h2>
+  {% for m in outbox or [] %}
+  <div class="queue-card">
+    <div class="top">
+      <strong>{{ m.kind }}</strong>
+      <span class="tag">{{ m.status or 'fila' }}</span>
+    </div>
+    <p>{{ m.created_at }} · {{ m.to_email }}</p>
+    <p>{{ m.subject }}</p>
+    {% if m.error %}<p class="sub">{{ m.error }}</p>{% endif %}
+  </div>
+  {% endfor %}
+
+  <h2 style="font-size:16px;margin:16px 0 8px">Auditoria</h2>
+  {% for l in logs %}
+  <div class="queue-card">
+    <div class="top">
+      <strong>{{ l.action }}</strong>
+      <span class="tag {{ 'fam' if l.level in ['warn','crit'] else '' }}">{{ l.level }}</span>
+    </div>
+    <p>{{ l.created_at }} · {{ l.actor_name }} · {{ l.target }}</p>
+    {% if l.detail %}<p>{{ l.detail }}</p>{% endif %}
+    <p>IP {{ l.ip }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='sec' %}{% include "_nav_admin.html" %}{% endblock %}

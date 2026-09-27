@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Entrar — Central Táxi Cone Sul{% endblock %}
+{% block body_class %}login-body{% endblock %}
+{% block content %}
+<div class="login-hero">
+  <div class="logo">🚕</div>
+  <h1 style="font-size:26px">Central Táxi Cone Sul</h1>
+  <p style="opacity:.85;margin-top:6px;font-size:14px">Vilhena · Cerejeiras · Colorado · Cabixi · Pimenteiras</p>
+</div>
+<div class="page">
+  <form method="post">
+    <div class="form-group">
+      <label>E-mail ou telefone</label>
+      <input name="login" placeholder="beto@conesul.taxi ou 69999990000" required autofocus>
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" name="password" required>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+  </form>
+  <p style="text-align:center;margin-top:14px;font-size:14px">
+    <a href="{{ url_for('forgot_password') }}" style="color:#0f3d3e;font-weight:700">Esqueci a senha</a>
+    ·
+    <a href="{{ url_for('register') }}" style="color:#0f3d3e;font-weight:800">Criar conta</a>
+  </p>
+  <p class="hint" style="text-align:center;margin-top:16px">Cliente novo usa Criar conta. Taxista entra com o WhatsApp cadastrado pela central.</p>
+  <a class="btn btn-green btn-block" href="{{ url_for('instalar_app') }}">Instalar no celular</a>
+  <p style="text-align:center;margin-top:10px">
+    <a href="{{ url_for('admin_login') }}" style="color:#0f3d3e;font-weight:800">Acesso do administrador</a>
+  </p>
+</div>
+{% endblock %}

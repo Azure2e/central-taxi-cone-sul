@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Banco SQL + JWT{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Integração</div>
+  <h1>Banco SQL e JWT</h1>
+</div>
+<div class="page">
+  <div class="soft-card">
+    <strong>{{ engine }}</strong>
+    <p class="sub">{{ db_path }}</p>
+    <p class="hint">Toda a central grava em SQL: usuários, frota, corridas, pagamentos, auditoria.</p>
+  </div>
+  {% for c in counts %}
+  <div class="card" style="display:flex;justify-content:space-between">
+    <span>{{ c.tabela }}</span>
+    <strong>{{ c.linhas }}</strong>
+  </div>
+  {% endfor %}
+  <div class="soft-card">
+    <h2 style="font-size:16px">JWT</h2>
+    <p class="hint">Token HS256, validade {{ jwt_ttl }} min. Use no header Authorization: Bearer TOKEN.</p>
+    <p class="sub">POST /api/auth/login · GET /api/me · GET /api/rotas · GET /api/corridas</p>
+  </div>
+  <form method="post" action="{{ url_for('admin_antecedentes_api') }}" class="soft-card">
+    <h2 style="font-size:16px">API de antecedentes</h2>
+    <p class="hint">HTTPS opcional. Sem URL, a consulta fica registrada e o parecer é lançado na ficha.</p>
+    <div class="form-group">
+      <label>Webhook HTTPS</label>
+      <input name="antecedentes_api_url" value="{{ cfg.get('antecedentes_api_url','') if cfg else '' }}" placeholder="https://sua-api.com/antecedentes">
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Salvar API</button>
+  </form>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('admin_avisos') }}">Ver lembretes do app</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('admin_config') }}">Voltar</a>
+</div>
+{% endblock %}
+{% block nav %}{% set tab='cfg' %}{% include "_nav_admin.html" %}{% endblock %}

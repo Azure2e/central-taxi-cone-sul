@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Painel do taxista{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">{{ drv.route_label or 'Sem rota' }}</div>
+  <h1>{{ drv.name.split()[0] }}</h1>
+  <div class="admin-who">
+    {{ drv.plate or 'sem placa' }} ·
+    {% if drv.payment_status=='pago' %}taxa em dia{% else %}taxa pendente{% endif %}
+  </div>
+</div>
+<div class="page">
+  {% for p in my_parcels or [] %}
+  <div class="card">
+    <strong>📦 Encomenda #{{ p.id }} · {{ p.status }}</strong>
+    <p class="hint">{{ p.pickup_address }} → {{ p.delivery_address }}</p>
+    <p class="hint">De {{ p.sender_name }} para {{ p.recipient_name }}</p>
+    <div class="actions">
+      {% if p.status=='aceita' %}
+      <form method="post" action="{{ url_for('driver_parcel_status', pid=p.id, status='a_caminho') }}"><button class="btn btn-primary btn-sm" type="submit">Saiu para entrega</button></form>
+      {% endif %}
+      {% if p.status=='a_caminho' %}
+      <form method="post" action="{{ url_for('driver_parcel_status', pid=p.id, status='entregue') }}"><button class="btn btn-green btn-sm" type="submit">Entregue</button></form>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+  {% if unread_notes %}
+  <a class="card" href="{{ url_for('driver_notifications') }}">
+    <strong>🔔 {{ unread_notes }} aviso(s) da central</strong>
+    <p class="sub">Fila nova ou corrida despachada</p>
+  </a>
+  {% endif %}
+
+  <h2>Em curso</h2>
+  {% if not mine %}
+    <div class="list-empty">Nenhuma corrida com você agora.</div>
+  {% endif %}
+  {% for c in mine %}
+  <article class="fleet-card">
+    <header>
+      <div class="grow">
+        <strong>{{ c.route_label }}</strong>
+        <div class="sub">{{ c.passenger_name }} · {{ c.seats }} passageiro(s)</div>
+      </div>
+      <span class="badge blue">{{ c.status.replace('_',' ') }}</span>
+    </header>
+    <ul class="fleet-meta">
+      <li>📍 {{ c.pickup_address }}</li>
+      {% if c.scheduled_at %}<li>🗓️ {{ c.scheduled_at }}</li>{% endif %}
+    </ul>
+    <div class="actions">
+      {% if c.status=='aceita' %}
+      <form method="post" action="{{ url_for('driver_set_status', ride_id=c.id, status='a_caminho') }}">
+        <button class="btn btn-primary btn-sm" type="submit">Saindo para o endereço</button>
+      </form>
+      {% endif %}
+      {% if c.status=='a_caminho' %}
+      <form method="post" action="{{ url_for('driver_set_status', ride_id=c.id, status='em_andamento') }}">
+        <button class="btn btn-primary btn-sm" type="submit">Passageiro embarcou</button>
+      </form>
+      {% endif %}
+      {% if c.status=='em_andamento' %}
+      <form method="post" action="{{ url_for('driver_set_status', ride_id=c.id, status='concluida') }}">
+        <button class="btn btn-green btn-sm" type="submit">Entregar / concluir</button>
+      </form>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+
+  <h2 style="margin-top:18px">Fila da sua rota</h2>
+  {% if not queue %}
+    <div class="list-empty">Nada na fila. Quando a central ou o cliente pedir, aparece aqui.</div>
+  {% endif %}
+  {% for c in queue %}
+  <article class="fleet-card">
+    <header>
+      <div class="grow">
+        <strong>{% if c.kind=='agendada' %}Família{% else %}Imediata{% endif %}</strong>
+        <div class="sub">{{ c.passenger_name }}</div>
+      </div>
+      <span class="badge orange">{{ c.seats }} lugar(es)</span>
+    </header>
+    <ul class="fleet-meta">
+      <li>📍 {{ c.pickup_address }}</li>
+      {% if c.house_label %}<li>🏠 {{ c.house_label }}</li>{% endif %}
+      {% if c.scheduled_at %}<li>🗓️ {{ c.scheduled_at }}</li>{% endif %}
+    </ul>
+    <form method="post" action="{{ url_for('driver_accept', ride_id=c.id) }}" style="margin-top:10px">
+      <button class="btn btn-green btn-block" type="submit">Aceitar esta corrida</button>
+    </form>
+  </article>
+  {% endfor %}
+
+  <a class="btn btn-ghost btn-block" href="{{ url_for('logout') }}" style="margin-top:12px">Sair</a>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Rotas{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Cone Sul</div>
+  <h1>Rotas</h1>
+</div>
+<div class="page">
+  <p class="hint">Toque na linha do mapa para ver o preço da rota.</p>
+  {% include "_leaflet_map.html" %}
+  <p class="hint">Preços base por veículo. No agendamento familiar o valor é da corrida (até 4 pessoas da mesma casa).</p>
+  {% for r in routes %}
+  <div class="card">
+    <div class="route-card">
+      <div class="route-ico">🛣️</div>
+      <div class="grow">
+        <h3>{{ r.label }}</h3>
+        <p>{{ r.distance_km }} km · cerca de {{ r.duration_min }} min</p>
+      </div>
+      <strong>R$ {{ '%.2f'|format(r.price) }}</strong>
+    </div>
+    <div class="pill-row">
+      <span class="chip">{{ r.livres or 0 }} livres</span>
+      <span class="chip">{{ r.total_taxis or 0 }} cadastrados</span>
+    </div>
+    <div class="row2">
+      <a class="btn btn-primary" href="{{ url_for('request_now', route_id=r.id) }}">Pedir agora</a>
+      <a class="btn btn-ghost" href="{{ url_for('schedule_ride') }}">Agendar casa</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='rotas' %}{% include "_nav_passenger.html" %}{% endblock %}

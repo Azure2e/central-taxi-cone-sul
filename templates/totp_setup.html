@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Autenticação de dois fatores{% endblock %}
+{% block extra_css %}
+{% if user and user.role=='admin' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endif %}
+{% endblock %}
+{% block body_class %}{{ 'admin-body' if user and user.role=='admin' else '' }}{% endblock %}
+{% block shell_class %}{{ 'admin-shell admin-list-page' if user and user.role=='admin' else '' }}{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Segurança</div>
+  <h1>2FA / TOTP</h1>
+</div>
+<div class="page">
+  {% if just_on and backup_codes %}
+    <div class="card">
+      <strong>Guarde estes códigos de recuperação</strong>
+      <p class="hint">Cada um vale uma vez, se você perder o celular.</p>
+      <div class="pill-row">
+        {% for c in backup_codes %}
+          <span class="chip" style="font-family:monospace">{{ c }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if enabled %}
+    <div class="card">
+      <span class="badge green">2FA ativo</span>
+      <p class="hint" style="margin-top:8px">O login desta conta pede senha + código do aplicativo.</p>
+    </div>
+    <form method="post" action="{{ url_for('totp_disable') }}">
+      <div class="form-group">
+        <label>Senha atual</label>
+        <input type="password" name="password" required>
+      </div>
+      <div class="form-group">
+        <label>Código do app (ou recuperação)</label>
+        <input name="code" required>
+      </div>
+      <button class="btn btn-ghost btn-block" type="submit">Desativar 2FA</button>
+    </form>
+  {% elif step=='confirm' %}
+    <div class="card" style="text-align:center">
+      <p class="hint">Escaneie no aplicativo autenticador</p>
+      {% if qr %}<img src="{{ qr }}" alt="QR Code 2FA" width="220" height="220" style="border-radius:16px">{% endif %}
+      <p class="hint" style="margin-top:10px">Ou digite a chave:</p>
+      <p style="font-family:monospace;font-weight:800;letter-spacing:.08em;word-break:break-all">{{ secret }}</p>
+    </div>
+    <form method="post">
+      <input type="hidden" name="action" value="confirm">
+      <div class="form-group">
+        <label>Código gerado agora</label>
+        <input name="code" inputmode="numeric" maxlength="8" required autofocus>
+      </div>
+      <button class="btn btn-green btn-block" type="submit">Ativar 2FA</button>
+    </form>
+  {% else %}
+    <p class="hint">Use Google Authenticator, Authy, 1Password ou o app de senhas do celular. Depois da senha, o sistema pede um código de 6 dígitos que muda a cada 30 segundos.</p>
+    <form method="post">
+      <input type="hidden" name="action" value="start">
+      <button class="btn btn-primary btn-block" type="submit">Gerar QR Code</button>
+    </form>
+  {% endif %}
+  <a class="btn btn-ghost btn-block" href="{{ url_for('home') }}" style="margin-top:10px">Voltar</a>
+</div>
+{% endblock %}

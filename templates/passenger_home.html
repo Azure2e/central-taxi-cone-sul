@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Início — Cone Sul{% endblock %}
+{% block content %}
+<div class="topbar light">
+  <div class="topbar-row">
+    <div class="brand-mark">🚕</div>
+    <div class="grow">
+      <div class="brand-title">Central Táxi Cone Sul</div>
+    </div>
+    <div>📍</div>
+  </div>
+</div>
+<div class="page">
+  <a class="btn btn-green btn-block" href="{{ url_for('share_module') }}" style="margin-bottom:12px">Compartilhar — os dois ganham</a>
+  <a class="btn btn-primary btn-block" href="{{ url_for('parcel_new') }}" style="margin-bottom:8px">Enviar encomenda</a>
+  {% include "_leaflet_map.html" %}
+  <h2>Rotas Disponíveis</h2>
+  <p class="hint">Selecione a rota para solicitar corrida</p>
+
+  {% for r in routes %}
+  <a class="card route-card" href="{{ url_for('request_now', route_id=r.id) }}">
+    <div class="route-ico">📍</div>
+    <div class="grow">
+      <h3>{{ r.label }}</h3>
+      <p>{{ r.livres or 0 }} taxistas disponíveis · R$ {{ '%.2f'|format(r.price) }}</p>
+    </div>
+    <span class="badge green">Disponível</span>
+  </a>
+  {% endfor %}
+
+  <a class="btn btn-green btn-block" href="{{ url_for('schedule_ride') }}" style="margin-top:8px">
+    📅 Agendar até 4 pessoas da casa
+  </a>
+
+  <a class="card" href="{{ url_for('passenger_notifications') }}">
+    <strong>Avisos da corrida</strong>
+    <p class="sub">{% if unread_notes %}{{ unread_notes }} novo(s) — inclusive quando o táxi chega a 200 m{% else %}Quando o taxista estiver a 200 metros da casa, o aviso aparece aqui{% endif %}</p>
+  </a>
+
+  {% if upcoming %}
+  <h2 style="margin-top:22px">Próximas</h2>
+  {% for c in upcoming %}
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px">
+      <strong>{{ c.route_label }}</strong>
+      <span class="badge {{ 'blue' if c.kind=='agendada' else 'green' }}">{{ c.kind }}</span>
+    </div>
+    <p class="sub" style="margin-top:4px">
+      {{ c.seats }} lugar(es) · {{ c.status }}
+      {% if c.scheduled_at %} · {{ c.scheduled_at }}{% endif %}
+    </p>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='inicio' %}{% include "_nav_passenger.html" %}{% endblock %}

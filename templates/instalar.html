@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Instalar no celular{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Módulo mobile</div>
+  <h1>Instalar o app</h1>
+</div>
+<div class="page">
+  <div class="login-hero" style="border-radius:18px;margin-bottom:14px;min-height:160px">
+    <h2 style="font-size:20px">Central Táxi Cone Sul</h2>
+    <p style="opacity:.9;font-size:13px">Na tela inicial do celular, como um aplicativo</p>
+  </div>
+  <button class="btn btn-green btn-block" type="button" id="pwa-install-btn">Instalar agora</button>
+  <p class="hint" id="pwa-hint" style="margin-top:10px">Se o botão não abrir a janela, use o passo do seu celular abaixo.</p>
+
+  <div class="card">
+    <strong>Android (Chrome)</strong>
+    <ol class="hint" style="padding-left:18px;margin-top:8px">
+      <li>Abra este site no Chrome.</li>
+      <li>Toque em <b>Instalar agora</b> ou no menu ⋮.</li>
+      <li>Escolha <b>Adicionar à tela inicial</b> / <b>Instalar app</b>.</li>
+    </ol>
+  </div>
+  <div class="card">
+    <strong>iPhone (Safari)</strong>
+    <ol class="hint" style="padding-left:18px;margin-top:8px">
+      <li>Abra no Safari (não no Chrome).</li>
+      <li>Toque em Compartilhar (quadrado com seta).</li>
+      <li>Toque em <b>Adicionar à Tela de Início</b>.</li>
+    </ol>
+  </div>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('pwa_lab') }}">Testar service worker</a>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('login') }}">Voltar ao login</a>
+</div>
+{% endblock %}

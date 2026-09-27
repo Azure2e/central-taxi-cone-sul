@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Caixa — Mensalidades{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Financeiro · {{ month_label }}</div>
+  <h1>Caixa da central</h1>
+</div>
+<div class="page">
+  <div class="rev-card">
+    <div class="rev-top">
+      <div>
+        <div class="lbl">Receita recebida</div>
+        <div class="amount">R$ {{ receita_fmt }}</div>
+      </div>
+      <span class="trend">{{ rev.pagos }}/{{ rev.total }}</span>
+    </div>
+    <div class="meta">{{ rev.pagos }} pagos · {{ rev.total|int - rev.pagos|int }} em aberto · taxa R$ 50,00</div>
+  </div>
+
+  <div class="kpi-grid stagger">
+    <div class="kpi mint"><div class="k">Em dia</div><div class="n">{{ rev.pagos }}</div><div class="s">já baixados</div></div>
+    <div class="kpi blush"><div class="k">A receber</div><div class="n">R$ {{ aberto_fmt }}</div><div class="s">{{ rev.total|int - rev.pagos|int }} taxas</div></div>
+    <div class="kpi gold"><div class="k">Ticket</div><div class="n">50</div><div class="s">reais / mês</div></div>
+    <div class="kpi sky"><div class="k">Frota</div><div class="n">{{ rev.total }}</div><div class="s">motoristas</div></div>
+  </div>
+
+  <form method="get" class="fleet-filter">
+    <input name="q" value="{{ q }}" placeholder="Nome, placa ou WhatsApp">
+    <div class="row2">
+      <select name="pag">
+        <option value="">Pago e pendente</option>
+        <option value="pendente" {% if pag=='pendente' %}selected{% endif %}>Só pendente</option>
+        <option value="pago" {% if pag=='pago' %}selected{% endif %}>Só pago</option>
+      </select>
+      <select name="rota">
+        <option value="">Todas as rotas</option>
+        {% for r in routes %}
+        <option value="{{ r.id }}" {% if rota==r.id|string %}selected{% endif %}>{{ r.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Filtrar caixa</button>
+  </form>
+
+  <form method="post" action="{{ url_for('admin_block_unpaid') }}" onsubmit="return confirm('Tirar da fila quem está com taxa atrasada?')">
+    <button class="btn btn-red btn-block" type="submit">Bloquear inadimplentes</button>
+  </form>
+
+  <p class="hint">{{ drivers|length }} nesta lista · pendentes primeiro</p>
+
+  {% for d in drivers %}
+  <article class="fleet-card {{ 'is-blocked' if d.payment_status=='pendente' else '' }}">
+    <header>
+      <div class="ava" style="background:{{ d.color or '#0b3a66' }}">{{ d.initials or 'TX' }}</div>
+      <div class="grow">
+        <strong>{{ d.name }}</strong>
+        <div class="sub">{{ d.phone_fmt }} · {{ d.plate }}</div>
+      </div>
+      {% if d.payment_status=='pago' %}
+      <span class="badge green">Pago</span>
+      {% else %}
+      <span class="badge orange">Em aberto</span>
+      {% endif %}
+    </header>
+    <ul class="fleet-meta">
+      <li>🗺️ {{ d.route_label }}</li>
+      <li>💵 R$ {{ d.fee_fmt }} este mês</li>
+      <li>{% if d.status=='bloqueado' %}🚫 fora da fila{% else %}🚕 na rua{% endif %}</li>
+    </ul>
+    <div class="actions">
+      {% if d.wa %}
+      <a class="btn btn-green btn-sm" href="https://wa.me/55{{ d.wa }}?text={{ 'Oi '|urlencode }}{{ d.name.split()[0]|urlencode }}{{ ', a mensalidade da Central Táxi Cone Sul (R$ 50) está em aberto.'|urlencode }}" target="_blank" rel="noopener">Cobrar no Zap</a>
+      {% endif %}
+      {% if d.payment_status=='pendente' %}
+      <form method="post" action="{{ url_for('admin_mark_paid', driver_id=d.id) }}">
+        <input type="hidden" name="status" value="pago">
+        <button class="btn btn-primary btn-sm" type="submit">Dar baixa R$ 50</button>
+      </form>
+      {% else %}
+      <form method="post" action="{{ url_for('admin_mark_paid', driver_id=d.id) }}">
+        <input type="hidden" name="status" value="pendente">
+        <button class="btn btn-ghost btn-sm" type="submit">Estornar / pendente</button>
+      </form>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+
+  {% if receipts %}
+  <h2 style="font-size:16px;margin:16px 0 8px">Últimas baixas</h2>
+  {% for p in receipts %}
+  <p class="sub">{{ p.paid_at or p.month }}/{{ p.year }} · {{ p.name }} · {{ p.plate }} · R$ {{ '%.2f'|format(p.amount or 50) }} · {{ p.status }}</p>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='pay' %}{% include "_nav_admin.html" %}{% endblock %}

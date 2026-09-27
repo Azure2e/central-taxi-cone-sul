@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Compartilhar — os dois ganham{% endblock %}
+{% block content %}
+<div class="topbar">
+  <div class="brand-sub">Indicação</div>
+  <h1>Os dois ganham</h1>
+</div>
+<div class="page">
+  <p class="hint">Compartilhe seu código. Quando a pessoa criar conta, <b>você e ela</b> recebem R$ {{ '%.2f'|format(bonus) }} de crédito.</p>
+  <div class="card">
+    <div class="sub">Seu código</div>
+    <h2 style="letter-spacing:2px;margin:6px 0">{{ code }}</h2>
+    <p class="hint" style="word-break:break-all">{{ link }}</p>
+    <p><strong>Seu crédito:</strong> R$ {{ '%.2f'|format(credit) }}</p>
+  </div>
+  <a class="btn btn-green btn-block" target="_blank" rel="noopener"
+     href="https://wa.me/?text={{ ('Te indiquei na Central Táxi Cone Sul. Usa meu código '+code+' e a gente ganha os dois: '+link)|urlencode }}">
+    Enviar no WhatsApp
+  </a>
+  <h2 style="font-size:16px;margin:18px 0 8px">Quem entrou com seu código</h2>
+  {% if not lista %}
+  <p class="hint">Ainda ninguém usou. Mande o WhatsApp acima.</p>
+  {% endif %}
+  {% for i in lista %}
+  <div class="card"><strong>{{ i.guest_name }}</strong><div class="sub">+ R$ {{ '%.2f'|format(i.bonus) }} para os dois</div></div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block nav %}{% set tab='perfil' %}{% include "_nav_passenger.html" %}{% endblock %}

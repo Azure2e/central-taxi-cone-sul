@@ -1,0 +1,96 @@
+html[data-theme="uber"], html[data-theme="auto"] {
+  --navy: #000;
+  --navy-2: #111;
+  --navy-dark: #000;
+  --gold: #06C167;
+  --yellow: #06C167;
+  --green: #06C167;
+  --green-soft: #e9f9f0;
+  --bg: #ffffff;
+  --card: #ffffff;
+  --text: #000000;
+  --muted: #6b6b6b;
+  --line: #eeeeee;
+  --shadow: 0 8px 24px rgba(0,0,0,.08);
+  --radius: 12px;
+}
+body {
+  font-family: Inter, "UberMove", "Helvetica Neue", Arial, sans-serif !important;
+  background: #fff !important;
+  color: #000;
+}
+.shell {
+  max-width: 430px;
+  margin: 0 auto 72px;
+  background: #fff;
+  min-height: 100vh;
+  border-radius: 0;
+  box-shadow: none;
+  border: 0;
+}
+.topbar {
+  background: #000 !important;
+  color: #fff !important;
+  padding: 18px 20px 16px;
+}
+.topbar.light {
+  background: #fff !important;
+  color: #000 !important;
+  border-bottom: 1px solid #eee;
+}
+.topbar h1 { font-size: 28px; font-weight: 700; letter-spacing: -.04em; }
+.brand-title { font-weight: 700; }
+.page { padding: 16px 20px 28px; }
+.card, .route-card, .soft-card, .fleet-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  box-shadow: none;
+  animation: uber-rise .45s cubic-bezier(.23,1,.32,1) both;
+}
+.route-card:active, .card:active { transform: scale(.98); }
+.btn {
+  border-radius: 8px;
+  font-weight: 600;
+  letter-spacing: 0;
+  min-height: 48px;
+  transition: transform .15s ease, background .15s ease;
+}
+.btn:active { transform: scale(.98); }
+.btn-primary { background: #000; color: #fff; }
+.btn-green { background: #06C167; color: #fff; }
+.btn-ghost { background: #eee; color: #000; }
+.nav {
+  background: #fff;
+  border-top: 1px solid #eee;
+  box-shadow: none;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav a { color: #6b6b6b; font-size: 11px; font-weight: 500; }
+.nav a.active { color: #000; }
+.nav a span { font-size: 20px; }
+input, select, textarea {
+  border: 0;
+  background: #f3f3f3 !important;
+  border-radius: 8px;
+  min-height: 48px;
+  padding: 12px 14px;
+}
+.login-hero {
+  min-height: 260px;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.72) 100%),
+    url("../img/capa_taxi.jpg") center 45% / cover no-repeat !important;
+}
+@keyframes uber-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.page > * { animation: uber-rise .4s cubic-bezier(.23,1,.32,1) both; }
+.page > *:nth-child(2) { animation-delay: .04s; }
+.page > *:nth-child(3) { animation-delay: .08s; }
+.page > *:nth-child(4) { animation-delay: .12s; }
+.page > *:nth-child(5) { animation-delay: .16s; }
+@media (prefers-reduced-motion: reduce) {
+  .page > *, .card { animation: none !important; }
+}

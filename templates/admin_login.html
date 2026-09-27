@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Acesso administrador{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block body_class %}admin-body{% endblock %}
+{% block content %}
+<div class="login-hero">
+  <div class="logo">🛡️</div>
+  <h1 style="font-size:24px">Área restrita</h1>
+  <p style="opacity:.85;margin-top:6px;font-size:14px">Somente o administrador da Central Táxi Cone Sul</p>
+</div>
+<div class="page">
+  <form method="post" autocomplete="off">
+    <div class="form-group">
+      <label>E-mail ou telefone do admin</label>
+      <input name="login" required autofocus placeholder="beto@conesul.taxi">
+    </div>
+    <div class="form-group">
+      <label>Senha do administrador</label>
+      <input type="password" name="password" required>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Entrar no painel</button>
+  </form>
+  <p class="hint" style="text-align:center;margin-top:14px">Cliente e taxista usam a entrada comum. Esta senha não libera o app deles.</p>
+  <a class="btn btn-ghost btn-block" href="{{ url_for('login') }}">Voltar à entrada geral</a>
+</div>
+{% endblock %}

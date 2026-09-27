@@ -1,0 +1,20 @@
+<nav class="nav admin-nav">
+  <a href="{{ url_for('admin_dashboard') }}" class="{{ 'active' if tab=='dash' }}">
+    <span>📊</span>Dashboard
+  </a>
+  <a href="{{ url_for('admin_drivers') }}" class="{{ 'active' if tab=='mot' }}">
+    <span>👤</span>Motoristas
+  </a>
+  <a href="{{ url_for('admin_rides') }}" class="{{ 'active' if tab=='rides' }}">
+    <span>🚕</span>Corridas
+  </a>
+  <a href="{{ url_for('admin_parcels') }}" class="{{ 'active' if tab=='box' }}">
+    <span>📦</span>Encomendas
+  </a>
+  <a href="{{ url_for('admin_payments') }}" class="{{ 'active' if tab=='pay' }}">
+    <span>💵</span>Pagamentos
+  </a>
+  <a href="{{ url_for('admin_security') }}" class="{{ 'active' if tab=='sec' }}">
+    <span>🛡️</span>Segurança
+  </a>
+</nav>
