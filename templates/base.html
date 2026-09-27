@@ -54,7 +54,7 @@
       <button class="btn btn-sm btn-primary" type="button" id="pwa-install-btn">Adicionar</button>
     </div>
   </div>
-  {% block nav %}{% endblock %}
+  
   <script>
     (function () {
       var token = {{ (csrf_token or '')|tojson }};
@@ -93,3 +93,4 @@
   <script src="{{ url_for('static', filename='js/pwa.js') }}"></script>
 </body>
 </html>
+

@@ -383,3 +383,5 @@ a.kpi { color: inherit; text-decoration: none; }
   padding: 12px 6px; border-radius: 12px; font-size: 12px; font-weight: 600;
 }
 .ctrl:active { background: #06C167; color: #fff; }
+
+.nav, .admin-nav, .menu-inferior { display:none !important; }
