@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Despacho — Corridas{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.despacho-hero{background:linear-gradient(160deg,#0f172a,#1e3a5f 50%,#0f766e);color:#fff;padding:22px 18px 26px;border-radius:0 0 28px 28px}
+.despacho-hero .brand-sub{color:#7dd3fc;letter-spacing:.12em;text-transform:uppercase;font-size:11px;margin:0 0 8px}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:24px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+</style>
+{% endblock %}
 {% block body_class %}admin-body{% endblock %}
 {% block shell_class %}admin-shell admin-list-page{% endblock %}
 {% block content %}
-<div class="topbar">
-  <div class="brand-sub">Mesa de despacho · ao vivo {{ agora }}</div>
-  <h1>Corridas da central</h1>
+<div class="admin-hero despacho-hero">
+  <p class="brand-sub">Mesa de despacho · ao vivo {{ agora }}</p>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Corridas da central</span></h1>
 </div>
 <div class="page">
   <div class="kpi-grid stagger">
@@ -98,5 +107,6 @@
   {% endfor %}
 </div>
 {% endblock %}
+
 
 
