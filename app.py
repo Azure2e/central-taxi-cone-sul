@@ -838,6 +838,21 @@ def migrate_security():
     db.close()
 
 
+
+def ensure_routes():
+    try:
+        n = query("SELECT COUNT(*) AS c FROM routes", one=True)
+        if n and int(n["c"] or 0) > 0:
+            return
+    except Exception:
+        return
+    for r in [
+        ("Vilhena", "Cerejeiras", "Vilhena x Cerejeiras", 88, 180.00, 90),
+        ("Vilhena", "Colorado do Oeste", "Vilhena x Colorado do Oeste", 72, 160.00, 75),
+        ("Vilhena", "Cabixi", "Vilhena x Cabixi", 95, 200.00, 100),
+        ("Vilhena", "Pimenteiras", "Vilhena x Pimenteiras", 110, 220.00, 115),
+    ]:
+        execute("INSERT INTO routes (origin,destination,label,distance_km,price,duration_min) VALUES (?,?,?,?,?,?)", r)
 def seed_if_empty():
     db = sqlite3.connect(DB_PATH)
     db.row_factory = sqlite3.Row
@@ -2725,6 +2740,7 @@ def request_now(route_id):
 @app.route("/app/encomenda", methods=["GET", "POST"])
 @login_required("passageiro")
 def parcel_new():
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     user = current_user()
     if request.method == "POST":
@@ -2923,6 +2939,7 @@ def driver_parcel_status(pid, status):
 @login_required("passageiro")
 def schedule_ride():
     """Módulo: agendar até 4 pessoas da mesma casa."""
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     user = current_user()
     if request.method == "POST":
@@ -3598,6 +3615,7 @@ def admin_drivers():
            FROM drivers""",
         one=True,
     )
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     return render_template(
         "admin_motoristas.html",
@@ -3968,6 +3986,7 @@ def admin_payments():
            JOIN users ON users.id = drivers.user_id
            ORDER BY payments.id DESC LIMIT 8"""
     )
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     meses = {
         "January": "Janeiro", "February": "Fevereiro", "March": "Março",
@@ -4150,6 +4169,7 @@ def admin_rides():
            FROM rides""",
         one=True,
     )
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     return render_template(
         "admin_corridas.html",
@@ -4168,6 +4188,7 @@ def admin_rides():
 @app.route("/admin/config", methods=["GET", "POST"])
 @login_required("admin")
 def admin_config():
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     if request.method == "POST":
         for r in routes:
@@ -4759,4 +4780,5 @@ if __name__ == "__main__":
     print("  Primeiro acesso admin: beto@conesul.taxi / admin123\n")
     port = int(os.environ.get("PORT", "5000"))
     app.run(host="0.0.0.0", port=port, debug=os.environ.get("FLASK_DEBUG") == "1")
+
 
