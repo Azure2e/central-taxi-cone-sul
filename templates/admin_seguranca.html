@@ -1,12 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Segurança{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.seg-hero{background:linear-gradient(160deg,#1e1b4b,#0f172a 55%,#7f1d1d);color:#fff;padding:22px 18px 26px;border-radius:0 0 28px 28px}
+.seg-hero .brand-sub{color:#c4b5fd;letter-spacing:.12em;text-transform:uppercase;font-size:11px}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:24px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+</style>
+{% endblock %}
 {% block body_class %}admin-body{% endblock %}
 {% block shell_class %}admin-shell admin-list-page{% endblock %}
 {% block content %}
-<div class="topbar">
+<div class="admin-hero seg-hero">
   <div class="brand-sub">Central de segurança</div>
-  <h1>Controle de acesso</h1>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Controle de acesso</span></h1>
 </div>
 <div class="page">
   <div class="kpi-grid stagger">
@@ -233,5 +242,6 @@
   {% endfor %}
 </div>
 {% endblock %}
+
 
 
