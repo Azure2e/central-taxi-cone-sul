@@ -2741,6 +2741,7 @@ def request_now(route_id):
 @login_required("passageiro")
 def parcel_new():
     ensure_routes()
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     user = current_user()
     if request.method == "POST":
@@ -2939,6 +2940,7 @@ def driver_parcel_status(pid, status):
 @login_required("passageiro")
 def schedule_ride():
     """Módulo: agendar até 4 pessoas da mesma casa."""
+    ensure_routes()
     ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     user = current_user()
@@ -3616,6 +3618,7 @@ def admin_drivers():
         one=True,
     )
     ensure_routes()
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     return render_template(
         "admin_motoristas.html",
@@ -3987,6 +3990,7 @@ def admin_payments():
            ORDER BY payments.id DESC LIMIT 8"""
     )
     ensure_routes()
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     meses = {
         "January": "Janeiro", "February": "Fevereiro", "March": "Março",
@@ -4170,6 +4174,7 @@ def admin_rides():
         one=True,
     )
     ensure_routes()
+    ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     return render_template(
         "admin_corridas.html",
@@ -4188,6 +4193,7 @@ def admin_rides():
 @app.route("/admin/config", methods=["GET", "POST"])
 @login_required("admin")
 def admin_config():
+    ensure_routes()
     ensure_routes()
     routes = query("SELECT * FROM routes ORDER BY id")
     if request.method == "POST":
@@ -4780,5 +4786,6 @@ if __name__ == "__main__":
     print("  Primeiro acesso admin: beto@conesul.taxi / admin123\n")
     port = int(os.environ.get("PORT", "5000"))
     app.run(host="0.0.0.0", port=port, debug=os.environ.get("FLASK_DEBUG") == "1")
+
 
 
