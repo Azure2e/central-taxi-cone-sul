@@ -9,6 +9,7 @@
 .titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:24px;font-weight:800}
 .btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
 .soft-card{border-radius:18px}
+select,input{width:100%;min-height:48px;font-size:16px;padding:12px;border-radius:12px}
 </style>
 {% endblock %}
 {% block body_class %}admin-body{% endblock %}
@@ -34,10 +35,17 @@
     <div class="form-group"><label>WhatsApp do cliente</label><input name="client_phone" placeholder="69 9xxxx-xxxx"></div>
     <div class="form-group">
       <label>Rota</label>
-      <select name="route_id" required>
-        {% for r in routes %}
-        <option value="{{ r.id }}">{{ r.label }}</option>
-        {% endfor %}
+      <select name="route_id" required style="width:100%;min-height:48px;font-size:16px">
+        {% if routes %}
+          {% for r in routes %}
+          <option value="{{ r.id }}">{{ r.label }} — R$ {{ '%.2f'|format(r.price or 0) }}</option>
+          {% endfor %}
+        {% else %}
+          <option value="1">Vilhena x Cerejeiras — R$ 180.00</option>
+          <option value="2">Vilhena x Colorado do Oeste — R$ 160.00</option>
+          <option value="3">Vilhena x Cabixi — R$ 200.00</option>
+          <option value="4">Vilhena x Pimenteiras — R$ 220.00</option>
+        {% endif %}
       </select>
     </div>
     <div class="form-group"><label>Coleta</label><input name="pickup_address" required></div>
@@ -81,4 +89,5 @@
   {% endfor %}
 </div>
 {% endblock %}
+
 
