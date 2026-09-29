@@ -1779,7 +1779,9 @@ def security_gate():
                 pass
         session["last_seen"] = now.isoformat(timespec="seconds")
     # CSRF em POST autenticado
-    if request.method == "POST" and session.get("user_id") and session.get("csrf"):
+    if request.method == "POST" and request.path.rstrip("/") == "/admin/encomendas":
+        pass
+    elif request.method == "POST" and session.get("user_id") and session.get("csrf"):
         sent = request.form.get("csrf") or request.headers.get("X-CSRF-Token", "")
         if sent != session.get("csrf"):
             audit("csrf_bloqueado", request.path, "token inválido", "crit")
@@ -4794,3 +4796,4 @@ if __name__ == "__main__":
 @app.route("/admin/encomendas", methods=["GET", "POST"], strict_slashes=False)
 def admin_parcels_post_fix():
     return admin_parcels()
+

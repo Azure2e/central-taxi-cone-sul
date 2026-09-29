@@ -19,7 +19,7 @@ select,input{width:100%;min-height:48px;font-size:16px;padding:12px;border-radiu
   <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Encomendas</span></h1>
 </div>
 <div class="page">
-  <form method="post" action="/admin/encomendas">
+  <form method="post" action="/admin/encomendas"><input type="hidden" name="csrf" value="{{ csrf_token }}">
     <h2 style="font-size:16px">Registrar encomenda</h2>
     <p class="hint">O cliente também pede no app: Encomenda → Enviar.</p>
     <div class="form-group">
@@ -69,7 +69,7 @@ select,input{width:100%;min-height:48px;font-size:16px;padding:12px;border-radiu
     <p>📤 {{ p.pickup_address }}</p>
     <p>📥 {{ p.delivery_address }} · {{ p.recipient_name }}</p>
     {% if p.status=='pendente' %}
-    <form method="post" action="/admin/encomendas">
+    <form method="post" action="/admin/encomendas"><input type="hidden" name="csrf" value="{{ csrf_token }}">
       <select name="driver_id" required>
         <option value="">Taxista da rota</option>
         {% for d in livres_by_route.get(p.route_id, []) %}
@@ -89,6 +89,7 @@ select,input{width:100%;min-height:48px;font-size:16px;padding:12px;border-radiu
   {% endfor %}
 </div>
 {% endblock %}
+
 
 
 
