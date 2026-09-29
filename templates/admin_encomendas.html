@@ -19,7 +19,7 @@ select,input{width:100%;min-height:48px;font-size:16px;padding:12px;border-radiu
   <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Encomendas</span></h1>
 </div>
 <div class="page">
-  <form method="post" class="soft-card">
+  <form method="post" action="{{ url_for('admin_parcels') }}" class="soft-card">
     <h2 style="font-size:16px">Registrar encomenda</h2>
     <p class="hint">O cliente também pede no app: Encomenda → Enviar.</p>
     <div class="form-group">
@@ -89,5 +89,6 @@ select,input{width:100%;min-height:48px;font-size:16px;padding:12px;border-radiu
   {% endfor %}
 </div>
 {% endblock %}
+
 
 
