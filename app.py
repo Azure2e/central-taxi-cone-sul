@@ -4790,3 +4790,7 @@ if __name__ == "__main__":
 
 
 
+
+@app.route("/admin/encomendas", methods=["GET", "POST"], strict_slashes=False)
+def admin_parcels_post_fix():
+    return admin_parcels()
