@@ -4821,3 +4821,13 @@ def admin_aparencia():
     flash("Cores e audio salvos.", "ok")
     return redirect(url_for("admin_config"))
 
+
+@app.route("/admin/avisos-sistema", methods=["POST"])
+@login_required("admin")
+def admin_avisos_sistema():
+    set_setting("ui_sound", "1" if request.form.get("ui_sound") else "0")
+    set_setting("sound_cashback", "1" if request.form.get("sound_cashback") else "0")
+    set_setting("remind_cnh", "1" if request.form.get("remind_cnh") else "0")
+    set_setting("remind_antec", "1" if request.form.get("remind_antec") else "0")
+    flash("Avisos sonoros, cashback e CNH/antecedentes salvos.", "ok")
+    return redirect(url_for("admin_config"))
