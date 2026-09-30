@@ -3,3 +3,4 @@ Werkzeug==3.0.4
 gunicorn==23.0.0
 pywebpush==2.0.3
 redis==5.2.1
+py-vapid==1.9.2
