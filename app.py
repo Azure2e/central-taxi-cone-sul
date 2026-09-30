@@ -3540,7 +3540,7 @@ def fmt_phone(phone):
     return phone or ""
 
 
-@app.route("/admin/motoristas")
+@app.route("/admin/motoristas", methods=["GET", "POST"], strict_slashes=False)
 @login_required("admin")
 def admin_drivers():
     q = request.args.get("q", "").strip()
@@ -3634,7 +3634,7 @@ def admin_drivers():
     )
 
 
-@app.route("/admin/motoristas/novo", methods=["POST"])
+@app.route("/admin/motoristas/novo", methods=["GET", "POST"], strict_slashes=False)
 @login_required("admin")
 def admin_new_driver():
     name = request.form.get("name", "").strip()
@@ -4796,4 +4796,5 @@ if __name__ == "__main__":
 @app.route("/admin/encomendas", methods=["GET", "POST"], strict_slashes=False)
 def admin_parcels_post_fix():
     return admin_parcels()
+
 
