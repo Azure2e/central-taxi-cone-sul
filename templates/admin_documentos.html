@@ -1,12 +1,23 @@
 {% extends "base.html" %}
 {% block title %}CNH e antecedentes{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.doc-hero{background:linear-gradient(160deg,#0f172a,#1e3a5f 50%,#0f766e);color:#fff;padding:22px 18px 26px;border-radius:0 0 28px 28px}
+.doc-hero .brand-sub{color:#7dd3fc;letter-spacing:.12em;text-transform:uppercase;font-size:11px;margin:0 0 8px}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:24px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.fleet-card,.soft-card{border-radius:18px}
+input,select{min-height:48px;width:100%;border-radius:12px}
+</style>
+{% endblock %}
 {% block body_class %}admin-body{% endblock %}
 {% block shell_class %}admin-shell admin-list-page{% endblock %}
 {% block content %}
-<div class="topbar">
-  <div class="brand-sub">Só a CNH + antecedentes</div>
-  <h1>{{ drv.name }}</h1>
+<div class="admin-hero doc-hero">
+  <p class="brand-sub">Só a CNH + antecedentes</p>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>{{ drv.name }}</span></h1>
 </div>
 <div class="page">
   <p class="hint">{{ drv.phone }} · {{ drv.plate }} · {{ drv.status }}</p>
@@ -69,5 +80,6 @@
   <a class="btn btn-ghost btn-block" href="{{ url_for('admin_drivers') }}">Voltar à frota</a>
 </div>
 {% endblock %}
+
 
 
