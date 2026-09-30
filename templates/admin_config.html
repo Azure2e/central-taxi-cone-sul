@@ -40,6 +40,16 @@
     <button class="btn btn-primary btn-block" type="submit" style="margin-top:10px">Salvar avisos</button>
     <a class="btn btn-ghost btn-block" href="/admin/avisos" style="margin-top:8px">Abrir lista de lembretes</a>
   </form>
+  <form method="post" action="/admin/avisos-sistema" class="soft-card">
+    <h2 style="font-size:16px">Avisos do sistema</h2>
+    <p class="hint">CNH vencendo/vencida e antecedentes pendentes entram sozinhos aqui e no app do taxista.</p>
+    <label class="hint"><input type="checkbox" name="ui_sound" value="1" checked> Ativar avisos sonoros</label>
+    <label class="hint"><input type="checkbox" name="sound_cashback" value="1" checked> Aviso sonoro de cashback</label>
+    <label class="hint"><input type="checkbox" name="remind_cnh" value="1" checked> Lembrete automatico de CNH vencendo/vencida</label>
+    <label class="hint"><input type="checkbox" name="remind_antec" value="1" checked> Lembrete automatico de antecedentes pendentes</label>
+    <button class="btn btn-primary btn-block" type="submit" style="margin-top:10px">Salvar avisos</button>
+    <a class="btn btn-ghost btn-block" href="/admin/avisos" style="margin-top:8px">Abrir lista de lembretes</a>
+  </form>
   <form method="post" action="{{ url_for('admin_whatsapp') }}" class="soft-card">
     <h2 style="font-size:16px">WhatsApp</h2>
     <p class="hint">Com token da Meta o aviso sai sozinho. Sem token, fica o registro e o wa.me.</p>
@@ -147,6 +157,7 @@
   <a class="btn btn-ghost btn-block" href="{{ url_for('logout') }}" style="margin-top:8px">Sair do painel</a>
 </div>
 {% endblock %}
+
 
 
 
