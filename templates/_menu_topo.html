@@ -1,48 +1,30 @@
 {% if user %}
-<button type="button" id="btnMenu" class="btn-menu-flutuante">☰</button>
-<div id="menuLateral" style="position:fixed;top:0;right:-100%;width:280px;height:100%;background:#fff;z-index:9999;transition:0.3s;box-shadow:-10px 0 30px rgba(0,0,0,.2);padding:20px;">
-  <button type="button" id="fecharMenu" style="float:right;font-size:24px;border:0;background:none;">✕</button>
-  <h3 style="margin-top:40px;">Menu</h3>
-  <nav style="display:flex;flex-direction:column;gap:12px;margin-top:20px;">
-    {% if user.role == 'admin' %}
-    <a href="{{ url_for('admin_dashboard') }}">📊 Painel</a>
-    <a href="{{ url_for('admin_drivers') }}">👨‍✈️ Motoristas</a>
-    <a href="{{ url_for('admin_rides') }}">🚕 Corridas</a>
-    <a href="{{ url_for('admin_parcels') }}">📦 Encomendas</a>
-    <a href="{{ url_for('admin_payments') }}">💰 Mensalidades</a>
-    <a href="{{ url_for('admin_security') }}">🔒 Segurança</a>
-    <a href="{{ url_for('admin_logs_live') }}">📝 Logs</a>
-    {% elif user.role == 'passageiro' %}
-    <a href="{{ url_for('passenger_home') }}">🏠 Início</a>
-    <a href="{{ url_for('passenger_rides') }}">🚕 Corridas</a>
-    <a href="{{ url_for('parcel_list') }}">📦 Encomenda</a>
-    <a href="{{ url_for('schedule_ride') }}">👨‍👩‍👧 Família</a>
-    <a href="{{ url_for('passenger_profile') }}">👤 Perfil</a>
-    {% else %}
-    <a href="{{ url_for('driver_home') }}">🚕 Fila</a>
-    <a href="{{ url_for('driver_notifications') }}">🔔 Avisos</a>
-    {% endif %}
-    <a href="{{ url_for('logout') }}" style="color:#dc2626;margin-top:20px;">🚪 Sair</a>
+<div id="menuLateral" style="position:fixed;top:0;right:-100%;width:300px;height:100%;background:linear-gradient(180deg,#0f172a,#14532d);color:#fff;z-index:9999;padding:24px 18px;transition:.3s;box-shadow:-16px 0 40px rgba(0,0,0,.35);">
+  <button type="button" id="fecharMenu" style="float:right;border:0;background:rgba(255,255,255,.12);color:#fff;width:40px;height:40px;border-radius:12px;font-size:20px;">✕</button>
+  <p style="margin:48px 0 6px;letter-spacing:.16em;text-transform:uppercase;font-size:11px;color:#86efac;">Cone Sul</p>
+  <h3 style="margin:0 0 22px;font-size:22px;">Menu</h3>
+  <nav style="display:flex;flex-direction:column;gap:10px;">
+    <a href="/admin" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">📊 Dashboard</a>
+    <a href="/admin/motoristas" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">👨‍✈️ Motoristas</a>
+    <a href="/admin/corridas" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">🚕 Corridas</a>
+    <a href="/admin/encomendas" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">📦 Encomendas</a>
+    <a href="/admin/pagamentos" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">💵 Pagamento</a>
+    <a href="/admin/seguranca" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">🔒 Segurança</a>
+    <a href="/logout" style="color:#fecaca;text-decoration:none;padding:12px 14px;border-radius:14px;margin-top:10px;background:rgba(127,29,29,.45);">🚪 Sair</a>
   </nav>
 </div>
-<div id="fundoEscuro" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;z-index:9998;"></div>
+<div id="fundoEscuro" style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9998;"></div>
 <script>
-const btn = document.getElementById('btnMenu');
-const menu = document.getElementById('menuLateral');
-const fundo = document.getElementById('fundoEscuro');
-const fechar = document.getElementById('fecharMenu');
-function abrir() {
-  if (!menu || !fundo) return;
-  menu.style.right = '0';
-  fundo.style.display = 'block';
-}
-function fecharMenu() {
-  if (!menu || !fundo) return;
-  menu.style.right = '-100%';
-  fundo.style.display = 'none';
-}
-if (btn) btn.onclick = abrir;
-if (fechar) fechar.onclick = fecharMenu;
-if (fundo) fundo.onclick = fecharMenu;
+document.addEventListener("DOMContentLoaded", function () {
+  var btn = document.getElementById("btnMenu");
+  var menu = document.getElementById("menuLateral");
+  var fundo = document.getElementById("fundoEscuro");
+  var fechar = document.getElementById("fecharMenu");
+  function abrir() { if (menu && fundo) { menu.style.right = "0"; fundo.style.display = "block"; } }
+  function fecha() { if (menu && fundo) { menu.style.right = "-100%"; fundo.style.display = "none"; } }
+  if (btn) btn.onclick = abrir;
+  if (fechar) fechar.onclick = fecha;
+  if (fundo) fundo.onclick = fecha;
+});
 </script>
 {% endif %}
