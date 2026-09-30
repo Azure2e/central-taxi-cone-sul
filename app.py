@@ -2730,7 +2730,7 @@ def request_now(route_id):
             notify_route_drivers(
                 route_id,
                 "Nova corrida na sua rota",
-                f"{user['name']} pediu {route['label']} agora. {address}",
+                f"{user['name']} pediu {route['label']}. {address}" + (f" · Msg: {notes}" if notes else ""),
                 ride_id,
                 kind="fila",
             )
@@ -4796,6 +4796,7 @@ if __name__ == "__main__":
 @app.route("/admin/encomendas", methods=["GET", "POST"], strict_slashes=False)
 def admin_parcels_post_fix():
     return admin_parcels()
+
 
 
 
