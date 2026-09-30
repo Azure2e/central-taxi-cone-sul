@@ -25,6 +25,12 @@
     </select>
     <button class="btn btn-primary btn-block" type="submit" style="margin-top:10px">Aplicar tema</button>
   </form>
+  <form method="post" action="/admin/aparencia" class="soft-card">
+    <h2 style="font-size:16px">Cores e audio</h2>
+    <div class="form-group"><label>Cor principal</label><input type="color" name="ui_color" value="#06C167"></div>
+    <label class="hint"><input type="checkbox" name="ui_sound" value="1" checked> Som ao entrar corrida</label>
+    <button class="btn btn-primary btn-block" type="submit" style="margin-top:10px">Salvar aparencia</button>
+  </form>
   <form method="post" action="{{ url_for('admin_whatsapp') }}" class="soft-card">
     <h2 style="font-size:16px">WhatsApp</h2>
     <p class="hint">Com token da Meta o aviso sai sozinho. Sem token, fica o registro e o wa.me.</p>
@@ -132,5 +138,6 @@
   <a class="btn btn-ghost btn-block" href="{{ url_for('logout') }}" style="margin-top:8px">Sair do painel</a>
 </div>
 {% endblock %}
+
 
 

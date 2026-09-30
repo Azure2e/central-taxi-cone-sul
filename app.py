@@ -4800,3 +4800,12 @@ def admin_parcels_post_fix():
 
 
 
+
+@app.route("/admin/aparencia", methods=["POST"])
+@login_required("admin")
+def admin_aparencia():
+    color = (request.form.get("ui_color") or "#06C167").strip()
+    set_setting("ui_color", color)
+    set_setting("ui_sound", "1" if request.form.get("ui_sound") else "0")
+    flash("Cores e audio salvos.", "ok")
+    return redirect(url_for("admin_config"))
