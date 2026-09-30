@@ -4803,9 +4803,21 @@ def admin_parcels_post_fix():
 
 @app.route("/admin/aparencia", methods=["POST"])
 @login_required("admin")
+def _hex_lum(hex_color):
+    h = hex_color.lstrip("#")
+    if len(h) == 3:
+        h = "".join(ch * 2 for ch in h)
+    if len(h) != 6:
+        return 0.2
+    r, g, b = int(h[0:2], 16)/255, int(h[2:4], 16)/255, int(h[4:6], 16)/255
+    def adj(c):
+        return c/12.92 if c <= 0.03928 else ((c+0.055)/1.055)**2.4
+    return 0.2126*adj(r) + 0.7152*adj(g) + 0.0722*adj(b)
+
 def admin_aparencia():
     color = (request.form.get("ui_color") or "#06C167").strip()
     set_setting("ui_color", color)
     set_setting("ui_sound", "1" if request.form.get("ui_sound") else "0")
     flash("Cores e audio salvos.", "ok")
     return redirect(url_for("admin_config"))
+

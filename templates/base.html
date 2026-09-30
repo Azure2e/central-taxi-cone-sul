@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/themes.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/uber.css') }}">
-  {% block extra_css %}{% endblock %}
+  {% block extra_css %}{% endblock %}<style>:root{--accent: {{ ui_color|default('#06C167') }};} .btn-primary,.btn-green,.btn-menu-hero{background:var(--accent)!important}</style>
   <script src="{{ url_for('static', filename='js/theme-auto.js') }}" defer></script>
 </head>
 <body class="{% block body_class %}{% endblock %}" data-theme="{{ ui_theme|default('auto') }}">
@@ -94,5 +94,6 @@
     {% include '_drawer.html' %}
 </body>
 </html>
+
 
 
