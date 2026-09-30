@@ -3591,8 +3591,8 @@ def admin_drivers():
         d["phone_fmt"] = fmt_phone(d.get("phone"))
         d["wa"] = "".join(ch for ch in str(d.get("phone") or "") if ch.isdigit())
         pack = docs_by.get(d["id"], {})
-        cnh = pack.get("cnh")
-        d["docs_ok"] = bool(cnh and cnh["status"] == "aprovado")
+        cnh = dict(pack.get("cnh") or {})
+        d["docs_ok"] = bool(cnh.get("status") == "aprovado")
         d["cnh_state"] = "sem_validade"
         d["cnh_left"] = None
         if cnh and cnh.get("expires_at"):
@@ -4796,5 +4796,6 @@ if __name__ == "__main__":
 @app.route("/admin/encomendas", methods=["GET", "POST"], strict_slashes=False)
 def admin_parcels_post_fix():
     return admin_parcels()
+
 
 
