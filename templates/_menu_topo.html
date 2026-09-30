@@ -1,19 +1,24 @@
 {% if user %}
-<div id="menuLateral" style="position:fixed;top:0;right:-100%;width:300px;height:100%;background:linear-gradient(180deg,#0f172a,#14532d);color:#fff;z-index:9999;padding:24px 18px;transition:.3s;box-shadow:-16px 0 40px rgba(0,0,0,.35);">
+<div id="menuLateral" style="position:fixed;top:0;right:-100%;width:300px;height:100%;background:linear-gradient(180deg,#0f172a,#14532d);color:#fff;z-index:9999;padding:24px 18px;transition:.3s;">
   <button type="button" id="fecharMenu" style="float:right;border:0;background:rgba(255,255,255,.12);color:#fff;width:40px;height:40px;border-radius:12px;font-size:20px;">✕</button>
   <p style="margin:48px 0 6px;letter-spacing:.16em;text-transform:uppercase;font-size:11px;color:#86efac;">Cone Sul</p>
   <h3 style="margin:0 0 22px;font-size:22px;">Menu</h3>
   <nav style="display:flex;flex-direction:column;gap:10px;">
-    <a href="/admin" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">📊 Dashboard</a>
-    <a href="/admin/motoristas" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">👨‍✈️ Motoristas</a>
-    <a href="/admin/corridas" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">🚕 Corridas</a>
-    <a href="/admin/encomendas" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">📦 Encomendas</a>
-    <a href="/admin/pagamentos" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">💵 Pagamento</a>
-    <a href="/admin/seguranca" style="color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08);">🔒 Segurança</a>
-    <a href="/logout" style="color:#fecaca;text-decoration:none;padding:12px 14px;border-radius:14px;margin-top:10px;background:rgba(127,29,29,.45);">🚪 Sair</a>
+    <a href="/admin">📊 Dashboard</a>
+    <a href="/admin/motoristas">👨‍✈️ Motoristas</a>
+    <a href="/admin/corridas">🚕 Corridas</a>
+    <a href="/admin/encomendas">📦 Encomendas</a>
+    <a href="/admin/pagamentos">💵 Pagamento</a>
+    <a href="/admin/avisos" id="linkAvisos">🔔 Notificações <span id="badgeFila"></span></a>
+    <a href="/admin/seguranca">🔒 Segurança</a>
+    <a href="/logout" style="color:#fecaca;">🚪 Sair</a>
   </nav>
 </div>
 <div id="fundoEscuro" style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9998;"></div>
+<style>
+#menuLateral a{color:#fff;text-decoration:none;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.08)}
+#linkAvisos{background:rgba(6,193,103,.25)}
+</style>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   var btn = document.getElementById("btnMenu");
@@ -25,6 +30,27 @@ document.addEventListener("DOMContentLoaded", function () {
   if (btn) btn.onclick = abrir;
   if (fechar) fechar.onclick = fecha;
   if (fundo) fundo.onclick = fecha;
+  function marca(n) {
+    var b = document.getElementById("badgeFila");
+    if (b) b.textContent = n ? "(" + n + ")" : "";
+    if (n && Notification.permission === "granted") {
+      document.title = "(" + n + ") Cone Sul";
+    }
+  }
+  if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
+  try {
+    var proto = location.protocol === "https:" ? "wss://" : "ws://";
+    var ws = new WebSocket(proto + location.host + "/ws/central");
+    ws.onmessage = function (ev) {
+      var d = JSON.parse(ev.data);
+      if (d && d.pendentes != null) {
+        if (d.pendentes > 0) {
+          if (Notification.permission === "granted") new Notification("Fila da central", { body: d.pendentes + " corrida(s)" });
+        }
+        marca(d.pendentes);
+      }
+    };
+  } catch (e) {}
 });
 </script>
 {% endif %}
