@@ -4192,7 +4192,7 @@ def admin_rides():
     )
 
 
-@app.route("/admin/config", methods=["GET", "POST"])
+@app.route("/admin/config", methods=["GET","POST"], strict_slashes=False)
 @login_required("admin")
 def admin_config():
     ensure_routes()
@@ -4831,3 +4831,4 @@ def admin_avisos_sistema():
     set_setting("remind_antec", "1" if request.form.get("remind_antec") else "0")
     flash("Avisos sonoros, cashback e CNH/antecedentes salvos.", "ok")
     return redirect(url_for("admin_config"))
+
