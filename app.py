@@ -4819,7 +4819,9 @@ def _hex_lum(hex_color):
         return c/12.92 if c <= 0.03928 else ((c+0.055)/1.055)**2.4
     return 0.2126*adj(r) + 0.7152*adj(g) + 0.0722*adj(b)
 
-@app.route("/admin/aparencia", methods=["POST"])`n@login_required("admin")`ndef admin_aparencia():
+@app.route("/admin/aparencia", methods=["POST"])
+@login_required("admin")
+def admin_aparencia():
     color = (request.form.get("ui_color") or "#06C167").strip()
     set_setting("ui_color", color)
     set_setting("ui_sound", "1" if request.form.get("ui_sound") else "0")
@@ -4836,6 +4838,7 @@ def admin_avisos_sistema():
     set_setting("remind_antec", "1" if request.form.get("remind_antec") else "0")
     flash("Avisos sonoros, cashback e CNH/antecedentes salvos.", "ok")
     return redirect(url_for("admin_config"))
+
 
 
 
