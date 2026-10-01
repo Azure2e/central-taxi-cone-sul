@@ -4832,3 +4832,4 @@ def admin_avisos_sistema():
     flash("Avisos sonoros, cashback e CNH/antecedentes salvos.", "ok")
     return redirect(url_for("admin_config"))
 
+
