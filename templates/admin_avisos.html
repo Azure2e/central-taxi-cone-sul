@@ -4,12 +4,20 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 <style>
 .nav,.admin-nav,#pwa-install{display:none!important}
-.aviso-hero{background:linear-gradient(160deg,#0f172a,#14532d 50%,#052e16);color:#fff;padding:22px 18px 26px;border-radius:0 0 28px 28px}
-.aviso-hero .brand-sub{color:#86efac;letter-spacing:.14em;text-transform:uppercase;font-size:11px;margin:0 0 8px}
-.titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:24px;font-weight:800}
+.aviso-hero{background:linear-gradient(165deg,#022c22,#0f172a 48%,#14532d);color:#fff;padding:26px 18px 30px;border-radius:0 0 32px 32px}
+.aviso-hero .brand-sub{color:#86efac;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:0 0 10px}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:26px;font-weight:800}
 .btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
-.soft-card,.card,.list-empty{border-radius:18px}
-label.hint{display:block;margin:10px 0}
+.page{padding:16px}
+.aviso-card{background:#fff;border-radius:22px;padding:18px;margin:14px 0;box-shadow:0 12px 30px rgba(15,23,42,.08)}
+.aviso-card h2{margin:0 0 6px;font-size:18px}
+.switch{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #eef2f7;font-weight:600}
+.switch:last-of-type{border-bottom:0}
+.switch input{width:22px;height:22px;accent-color:#06C167}
+.note{display:flex;gap:12px;background:#fff;border-radius:18px;padding:14px;margin:10px 0;box-shadow:0 8px 20px rgba(15,23,42,.06)}
+.note b{display:block}
+.empty{text-align:center;padding:28px 16px;color:#64748b}
+.btn-save{width:100%;margin-top:14px;min-height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-weight:800}
 </style>
 {% endblock %}
 {% block body_class %}admin-body{% endblock %}
@@ -19,25 +27,32 @@ label.hint{display:block;margin:10px 0}
   <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Lembretes automaticos</span></h1>
 </div>
 <div class="page">
-  <form method="post" action="/admin/config" class="soft-card">
+  <form method="post" action="/admin/config" class="aviso-card">
     <input type="hidden" name="salvar_avisos" value="1">
-    <h2 style="font-size:16px">Avisos do sistema</h2>
-    <p class="hint">CNH vencendo/vencida e antecedentes pendentes entram sozinhos aqui e no app do taxista.</p>
-    <label class="hint"><input type="checkbox" name="ui_sound" value="1" {% if (cfg or {}).get('ui_sound','1')=='1' %}checked{% endif %}> Ativar avisos sonoros</label>
-    <label class="hint"><input type="checkbox" name="sound_cashback" value="1" {% if (cfg or {}).get('sound_cashback','1')=='1' %}checked{% endif %}> Aviso sonoro de cashback</label>
-    <label class="hint"><input type="checkbox" name="remind_cnh" value="1" {% if (cfg or {}).get('remind_cnh','1')=='1' %}checked{% endif %}> CNH vencendo ou vencida</label>
-    <label class="hint"><input type="checkbox" name="remind_antec" value="1" {% if (cfg or {}).get('remind_antec','1')=='1' %}checked{% endif %}> Antecedentes pendentes</label>
-    <button class="btn btn-primary btn-block" type="submit">Salvar avisos</button>
+    <h2>Avisos do sistema</h2>
+    <p class="hint">CNH vencendo ou vencida e antecedentes pendentes entram sozinhos aqui e no app do taxista.</p>
+    <label class="switch"><input type="checkbox" name="ui_sound" value="1" {% if (cfg or {}).get('ui_sound','1')=='1' %}checked{% endif %}> Ativar avisos sonoros</label>
+    <label class="switch"><input type="checkbox" name="sound_cashback" value="1" {% if (cfg or {}).get('sound_cashback','1')=='1' %}checked{% endif %}> Aviso sonoro de cashback</label>
+    <label class="switch"><input type="checkbox" name="remind_cnh" value="1" {% if (cfg or {}).get('remind_cnh','1')=='1' %}checked{% endif %}> CNH vencendo ou vencida</label>
+    <label class="switch"><input type="checkbox" name="remind_antec" value="1" {% if (cfg or {}).get('remind_antec','1')=='1' %}checked{% endif %}> Antecedentes pendentes</label>
+    <button class="btn-save" type="submit">Salvar avisos</button>
   </form>
   {% if not notes %}
-    <div class="list-empty">Nenhum lembrete no momento.</div>
+  <div class="aviso-card empty">
+    <div style="font-size:36px">🔔</div>
+    <strong>Nenhum lembrete no momento</strong>
+    <p>Quando a CNH vencer ou faltar antecedente, o aviso aparece aqui.</p>
+  </div>
   {% endif %}
   {% for n in notes %}
-  <div class="card">
-    <strong>{{ n.title }}</strong>
-    <p style="margin-top:6px">{{ n.body }}</p>
-    <p class="sub">{{ n.created_at }} · {{ n.kind }}</p>
-  </div>
+  <article class="note">
+    <div style="font-size:22px">🔔</div>
+    <div>
+      <b>{{ n.title }}</b>
+      <p style="margin:4px 0">{{ n.body }}</p>
+      <small>{{ n.created_at }} · {{ n.kind }}</small>
+    </div>
+  </article>
   {% endfor %}
 </div>
 {% endblock %}
