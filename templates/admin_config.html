@@ -4,9 +4,9 @@
 {% block body_class %}admin-body{% endblock %}
 {% block shell_class %}admin-shell admin-list-page{% endblock %}
 {% block content %}
-<div class="topbar">
-  <div class="brand-sub">Sistema</div>
-  <h1>Configurações</h1>
+<div class="admin-hero cfg-hero">
+  <p class="brand-sub">Sistema</p>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Configurações</span></h1>
 </div>
 <div class="page">
   <p class="hint">Ajuste preço, distância e tempo estimado de cada rota da central.</p>
@@ -157,6 +157,7 @@
   <a class="btn btn-ghost btn-block" href="{{ url_for('logout') }}" style="margin-top:8px">Sair do painel</a>
 </div>
 {% endblock %}
+
 
 
 
