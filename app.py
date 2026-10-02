@@ -4850,3 +4850,16 @@ def admin_avisos_sistema():
 
 
 
+
+@app.route("/like", methods=["GET", "POST"])
+def page_like():
+    execute("CREATE TABLE IF NOT EXISTS likes (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, role TEXT, created_at TEXT)")
+    user = current_user()
+    if request.method == "POST":
+        name = (request.form.get("name") or (user["name"] if user else "Cliente")).strip()[:80]
+        execute("INSERT INTO likes (name, role, created_at) VALUES (?,?,?)", (name or "Cliente", user["role"] if user else "visitante", datetime.now().isoformat(timespec="seconds")))
+        flash("Obrigado pelo like!", "ok")
+        return redirect("/like")
+    total = query("SELECT COUNT(*) AS c FROM likes", one=True)
+    recent = query("SELECT * FROM likes ORDER BY id DESC LIMIT 12")
+    return render_template("like.html", total=(total or {"c": 0})["c"], recent=recent)
