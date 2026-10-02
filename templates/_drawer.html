@@ -1,9 +1,10 @@
 {% if user %}
-<div id="menuLateral" style="position:fixed;top:0;right:-100%;width:300px;height:100%;background:linear-gradient(180deg,#0f172a,#14532d);color:#fff;z-index:9999;padding:24px 18px;transition:.3s;">
+<div id="menuLateral" style="position:fixed;top:0;right:-100%;width:300px;height:100%;background:linear-gradient(180deg,#0f172a,#14532d);color:#fff;z-index:9999;padding:24px 18px 40px;transition:.3s;overflow-y:auto;">
   <button type="button" id="fecharMenu" style="float:right;border:0;background:rgba(255,255,255,.12);color:#fff;width:40px;height:40px;border-radius:12px;">✕</button>
   <p style="margin:48px 0 6px;letter-spacing:.16em;text-transform:uppercase;font-size:11px;color:#86efac;">Cone Sul</p>
   <h3 style="margin:0 0 18px;">Menu</h3>
   <nav style="display:flex;flex-direction:column;gap:10px;">
+    <a href="/logout" style="color:#fecaca;text-decoration:none;padding:12px;border-radius:14px;background:rgba(127,29,29,.55)">🚪 Sair</a>
     <a href="/admin" style="color:#fff;text-decoration:none;padding:12px;border-radius:14px;background:rgba(255,255,255,.08)">📊 Dashboard</a>
     <a href="/admin/motoristas" style="color:#fff;text-decoration:none;padding:12px;border-radius:14px;background:rgba(255,255,255,.08)">👨‍✈️ Motoristas</a>
     <a href="/admin/corridas" style="color:#fff;text-decoration:none;padding:12px;border-radius:14px;background:rgba(255,255,255,.08)">🚕 Corridas</a>
@@ -13,7 +14,6 @@
     <a href="/admin/config" style="color:#fff;text-decoration:none;padding:12px;border-radius:14px;background:rgba(255,255,255,.08)">⚙️ Configurações</a>
     <a href="/admin/seguranca" style="color:#fff;text-decoration:none;padding:12px;border-radius:14px;background:rgba(255,255,255,.08)">🔒 Segurança</a>
     <a href="/like" style="color:#fff;text-decoration:none;padding:12px;border-radius:14px;background:rgba(225,29,72,.35)">❤️ Deixar like</a>
-    <a href="/logout" style="color:#fecaca;text-decoration:none;padding:12px;border-radius:14px;background:rgba(127,29,29,.45)">🚪 Sair</a>
   </nav>
 </div>
 <div id="fundoEscuro" style="position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:9998;"></div>
