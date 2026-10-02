@@ -4,15 +4,16 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 <style>
 .nav,.admin-nav,#pwa-install{display:none!important}
-.like-hero{background:linear-gradient(165deg,#7f1d1d,#0f172a 50%,#14532d);color:#fff;padding:28px 18px 32px;border-radius:0 0 32px 32px;text-align:center}
-.like-hero .brand-sub{color:#fecaca;letter-spacing:.16em;text-transform:uppercase;font-size:11px}
-.titulo-painel{display:flex;align-items:center;justify-content:center;gap:14px;margin:8px 0 0;font-size:26px;font-weight:800}
+.like-hero{background:linear-gradient(165deg,#7f1d1d,#0f172a 46%,#14532d);color:#fff;padding:28px 18px 36px;border-radius:0 0 32px 32px;text-align:center}
+.like-hero .brand-sub{color:#fecaca;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:0}
+.titulo-painel{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0 0;font-size:26px;font-weight:800}
 .btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
-.like-count{font-size:56px;font-weight:800;margin:8px 0}
+.heart{font-size:42px;margin-top:12px}
+.like-count{font-size:64px;font-weight:800;line-height:1}
 .like-card{background:#fff;border-radius:22px;padding:18px;margin:16px;box-shadow:0 14px 32px rgba(15,23,42,.08)}
+.like-card input{width:100%;min-height:50px;border-radius:14px;border:1px solid #e2e8f0;padding:10px 12px;margin:8px 0 14px}
 .like-btn{width:100%;min-height:54px;border:0;border-radius:16px;background:#e11d48;color:#fff;font-size:18px;font-weight:800}
-.like-card input{width:100%;min-height:48px;border-radius:14px;border:1px solid #e2e8f0;padding:10px 12px;margin:10px 0}
-.like-row{padding:10px 0;border-bottom:1px solid #eef2f7}
+.like-row{padding:12px 0;border-bottom:1px solid #eef2f7}
 </style>
 {% endblock %}
 {% block body_class %}admin-body{% endblock %}
@@ -20,6 +21,7 @@
 <div class="like-hero">
   <p class="brand-sub">Cone Sul</p>
   <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Deixar like</span></h1>
+  <div class="heart">❤️</div>
   <div class="like-count">{{ total }}</div>
   <div>likes da central</div>
 </div>
@@ -27,14 +29,14 @@
   <form method="post" action="/like">
     <input type="hidden" name="csrf" value="{{ csrf_token }}">
     <label>Seu nome</label>
-    <input name="name" value="{{ user.name if user else '' }}" placeholder="Seu nome">
+    <input name="name" value="{{ user.name if user else '' }}" placeholder="Seu nome" required>
     <button class="like-btn" type="submit">Deixar like</button>
   </form>
 </div>
 <div class="like-card">
   <strong>Quem curtiu</strong>
   {% for row in recent %}
-  <div class="like-row">{{ row.name }} · {{ row.created_at }}</div>
+  <div class="like-row">❤️ {{ row.name }}<br><small>{{ row.created_at }}</small></div>
   {% else %}
   <p>Seja o primeiro a deixar like.</p>
   {% endfor %}
