@@ -1,15 +1,34 @@
 {% extends "base.html" %}
-{% block title %}Lembretes do app{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
+{% block title %}Notificacoes{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.aviso-hero{background:linear-gradient(160deg,#0f172a,#14532d 50%,#052e16);color:#fff;padding:22px 18px 26px;border-radius:0 0 28px 28px}
+.aviso-hero .brand-sub{color:#86efac;letter-spacing:.14em;text-transform:uppercase;font-size:11px;margin:0 0 8px}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:0;font-size:24px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.soft-card,.card,.list-empty{border-radius:18px}
+label.hint{display:block;margin:10px 0}
+</style>
+{% endblock %}
 {% block body_class %}admin-body{% endblock %}
-{% block shell_class %}admin-shell admin-list-page{% endblock %}
 {% block content %}
-<div class="topbar">
-  <div class="brand-sub">Notificações</div>
-  <h1>Lembretes automáticos</h1>
+<div class="admin-hero aviso-hero">
+  <p class="brand-sub">Notificacoes</p>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Lembretes automaticos</span></h1>
 </div>
 <div class="page">
-  <p class="hint">CNH vencendo/vencida e antecedentes pendentes entram sozinhos aqui e no app do taxista.</p>
+  <form method="post" action="/admin/config" class="soft-card">
+    <input type="hidden" name="salvar_avisos" value="1">
+    <h2 style="font-size:16px">Avisos do sistema</h2>
+    <p class="hint">CNH vencendo/vencida e antecedentes pendentes entram sozinhos aqui e no app do taxista.</p>
+    <label class="hint"><input type="checkbox" name="ui_sound" value="1" {% if (cfg or {}).get('ui_sound','1')=='1' %}checked{% endif %}> Ativar avisos sonoros</label>
+    <label class="hint"><input type="checkbox" name="sound_cashback" value="1" {% if (cfg or {}).get('sound_cashback','1')=='1' %}checked{% endif %}> Aviso sonoro de cashback</label>
+    <label class="hint"><input type="checkbox" name="remind_cnh" value="1" {% if (cfg or {}).get('remind_cnh','1')=='1' %}checked{% endif %}> CNH vencendo ou vencida</label>
+    <label class="hint"><input type="checkbox" name="remind_antec" value="1" {% if (cfg or {}).get('remind_antec','1')=='1' %}checked{% endif %}> Antecedentes pendentes</label>
+    <button class="btn btn-primary btn-block" type="submit">Salvar avisos</button>
+  </form>
   {% if not notes %}
     <div class="list-empty">Nenhum lembrete no momento.</div>
   {% endif %}
@@ -22,5 +41,3 @@
   {% endfor %}
 </div>
 {% endblock %}
-
-

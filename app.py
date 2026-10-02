@@ -3899,11 +3899,16 @@ def admin_antecedentes_online(driver_id):
 @app.route("/admin/avisos")
 @login_required("admin")
 def admin_avisos():
+    try:
+        run_doc_reminders()
+    except Exception:
+        pass
     rows = query(
         "SELECT * FROM notifications WHERE user_id=? ORDER BY id DESC LIMIT 40",
         (session["user_id"],),
     )
-    return render_template("admin_avisos.html", notes=rows)
+    cfg = {r["key"]: r["value"] for r in query("SELECT * FROM security_settings")}
+    return render_template("admin_avisos.html", notes=rows, cfg=cfg)
 
 
 @app.route("/admin/seguranca/antecedentes-api", methods=["POST"])
@@ -4838,6 +4843,7 @@ def admin_avisos_sistema():
     set_setting("remind_antec", "1" if request.form.get("remind_antec") else "0")
     flash("Avisos sonoros, cashback e CNH/antecedentes salvos.", "ok")
     return redirect(url_for("admin_config"))
+
 
 
 
