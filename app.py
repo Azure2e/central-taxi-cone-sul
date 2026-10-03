@@ -4855,7 +4855,14 @@ def admin_avisos_sistema():
 def page_like():
     execute("CREATE TABLE IF NOT EXISTS likes (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, role TEXT, created_at TEXT)")
     user = current_user()
+    if not user or user["role"] not in ("passageiro", "motorista"):
+        flash("Só cliente ou taxista cadastrado pode deixar like.", "err")
+        return redirect("/login")
     if request.method == "POST":
+        ja = query("SELECT id FROM likes WHERE name=? AND role=? LIMIT 1", (user["name"], user["role"]), one=True)
+        if ja:
+            flash("Você já deixou like nesta conta.", "warn")
+            return redirect("/like")
         name = (request.form.get("name") or (user["name"] if user else "Cliente")).strip()[:80]
         execute("INSERT INTO likes (name, role, created_at) VALUES (?,?,?)", (name or "Cliente", user["role"] if user else "visitante", datetime.now().isoformat(timespec="seconds")))
         flash("Obrigado pelo like!", "ok")
@@ -4863,3 +4870,4 @@ def page_like():
     total = query("SELECT COUNT(*) AS c FROM likes", one=True)
     recent = query("SELECT * FROM likes ORDER BY id DESC LIMIT 12")
     return render_template("like.html", total=(total or {"c": 0})["c"], recent=recent)
+
