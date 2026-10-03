@@ -1,34 +1,68 @@
 {% extends "base.html" %}
-{% block title %}Rastreio encomenda #{{ p.id }}{% endblock %}
+{% block title %}Rastreio #{{ p.id }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.trk-hero{background:linear-gradient(165deg,#0f172a,#14532d);color:#fff;padding:24px 18px 28px;border-radius:0 0 28px 28px}
+.titulo-painel{display:flex;align-items:center;gap:12px;margin:8px 0 0;font-size:26px}
+.btn-menu-hero{width:46px;height:46px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:20px}
+.page{padding:14px}
+.trk-card{background:#fff;border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 10px 24px rgba(15,23,42,.08)}
+#map{height:260px;border-radius:18px;overflow:hidden}
+.step{display:flex;gap:10px;padding:8px 0}
+.dot{width:12px;height:12px;border-radius:50%;background:#06C167;margin-top:4px}
+.btn-green{background:#06C167;color:#fff;border:0;border-radius:14px;min-height:48px;display:block;text-align:center;line-height:48px;text-decoration:none;font-weight:800}
+</style>
+{% endblock %}
 {% block content %}
-<div class="topbar">
-  <div class="brand-sub">{{ p.status }}</div>
-  <h1>Rastreio #{{ p.id }}</h1>
+<div class="trk-hero">
+  <p style="margin:0;letter-spacing:.14em;text-transform:uppercase;font-size:11px;color:#86efac">{{ p.status }}</p>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Rastreio #{{ p.id }}</span></h1>
 </div>
 <div class="page">
-  {% include "_leaflet_map.html" %}
-  <p class="hint">{{ p.pickup_address }} → {{ p.delivery_address }}</p>
-  <p class="hint">{% if p.driver_name %}Táxi {{ p.driver_name }} · {{ p.plate }}{% else %}Aguardando taxista{% endif %}</p>
-  <p id="gps-info" class="hint">Atualizando posição...</p>
-  {% if p.recipient_phone %}
-  <a class="btn btn-green btn-block" href="https://wa.me/55{{ p.recipient_phone }}">WhatsApp de quem recebe</a>
-  {% endif %}
-  <a class="btn btn-ghost btn-block" href="{{ url_for('parcel_list') }}">Minhas encomendas</a>
+  <div class="trk-card">{% include "_leaflet_map.html" %}<p id="gps-info">Desenhando a rota...</p></div>
+  <div class="trk-card">
+    <strong>{{ p.pickup_address }}</strong>
+    <p>→ {{ p.delivery_address }}</p>
+    <div class="step"><span class="dot"></span><div>Pedido recebido</div></div>
+    <div class="step"><span class="dot"></span><div>{% if p.driver_name %}Taxista {{ p.driver_name }} · {{ p.plate }}{% else %}Aguardando taxista{% endif %}</div></div>
+    <div class="step"><span class="dot"></span><div id="passo-gps">Posição ao vivo aparece quando o taxista liga o GPS</div></div>
+  </div>
+  {% if p.recipient_phone %}<a class="btn-green" href="https://wa.me/55{{ p.recipient_phone }}">WhatsApp de quem recebe</a>{% endif %}
+  <a class="btn btn-ghost btn-block" href="/encomenda">Minhas encomendas</a>
 </div>
 <script>
 (function () {
-  var id = {{ p.id }};
+  var cidades = { vilhena:[-12.74,-60.14], cerejeiras:[-13.19,-60.82], colorado:[-13.11,-60.54], cabixi:[-13.49,-60.55], pimenteiras:[-13.48,-61.04] };
+  var texto = ("{{ p.route_label or '' }} {{ p.pickup_address }} {{ p.delivery_address }}").toLowerCase();
+  function achar() {
+    var pts = [];
+    Object.keys(cidades).forEach(function (k) { if (texto.indexOf(k) >= 0) pts.push(cidades[k]); });
+    if (!pts.length) pts = [cidades.vilhena, cidades.cerejeiras];
+    return pts;
+  }
+  function desenha(extra) {
+    if (!window.__coneMap || !window.L) return setTimeout(function () { desenha(extra); }, 400);
+    var pts = achar();
+    if (extra) pts.push(extra);
+    L.polyline(pts, {color:"#06C167", weight:5}).addTo(window.__coneMap);
+    L.marker(pts[0]).addTo(window.__coneMap).bindPopup("Saida");
+    L.marker(pts[pts.length-1]).addTo(window.__coneMap).bindPopup("Entrega");
+    window.__coneMap.fitBounds(pts, {padding:[24,24]});
+  }
+  desenha();
   function tick() {
-    fetch("/api/gps/encomenda/" + id).then(function (r) { return r.json(); }).then(function (d) {
+    fetch("/api/gps/encomenda/{{ p.id }}").then(function (r) { return r.json(); }).then(function (d) {
       var el = document.getElementById("gps-info");
-      if (!d.ok) { el.textContent = "Sem GPS ainda"; return; }
-      el.textContent = d.lat ? ("GPS " + Number(d.lat).toFixed(5) + ", " + Number(d.lng).toFixed(5) + " · " + (d.quando || "")) : "Taxista sem localização no momento";
-      if (d.lat && window.__coneMap) {
-        if (!window.__parcelPin) {
-          window.__parcelPin = L.marker([d.lat, d.lng]).addTo(window.__coneMap).bindPopup("Encomenda");
-        } else {
-          window.__parcelPin.setLatLng([d.lat, d.lng]);
-        }
+      var passo = document.getElementById("passo-gps");
+      if (d && d.lat) {
+        el.textContent = "GPS " + Number(d.lat).toFixed(5) + ", " + Number(d.lng).toFixed(5);
+        passo.textContent = "Taxista na rota agora";
+        if (!window.__parcelPin) window.__parcelPin = L.marker([d.lat, d.lng]).addTo(window.__coneMap).bindPopup("Taxista");
+        else window.__parcelPin.setLatLng([d.lat, d.lng]);
+      } else {
+        el.textContent = "Rota no mapa. Taxista ainda sem GPS.";
       }
     }).catch(function () {});
   }
@@ -37,5 +71,3 @@
 })();
 </script>
 {% endblock %}
-
-
