@@ -4871,3 +4871,27 @@ def page_like():
     recent = query("SELECT * FROM likes ORDER BY id DESC LIMIT 12")
     return render_template("like.html", total=(total or {"c": 0})["c"], recent=recent)
 
+
+@app.route("/suporte", methods=["GET", "POST"])
+def page_suporte():
+    execute("CREATE TABLE IF NOT EXISTS support_tickets (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, nome TEXT, role TEXT, assunto TEXT, mensagem TEXT, status TEXT, created_at TEXT)")
+    user = current_user()
+    if not user:
+        flash("Entre na sua conta para abrir suporte.", "err")
+        return redirect("/login")
+    if request.method == "POST":
+        msg = (request.form.get("mensagem") or "").strip()
+        if len(msg) < 5:
+            flash("Escreva a mensagem do chamado.", "err")
+            return redirect("/suporte")
+        execute(
+            "INSERT INTO support_tickets (user_id, nome, role, assunto, mensagem, status, created_at) VALUES (?,?,?,?,?,?,?)",
+            (user["id"], user["name"], user["role"], request.form.get("assunto") or "Outro", msg[:500], "aberto", datetime.now().isoformat(timespec="seconds")),
+        )
+        flash("Chamado enviado. A central vai ver.", "ok")
+        return redirect("/suporte")
+    if user["role"] == "admin":
+        tickets = query("SELECT * FROM support_tickets ORDER BY id DESC LIMIT 30")
+    else:
+        tickets = query("SELECT * FROM support_tickets WHERE user_id=? ORDER BY id DESC LIMIT 20", (user["id"],))
+    return render_template("suporte.html", tickets=tickets)
