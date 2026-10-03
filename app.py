@@ -2827,31 +2827,42 @@ def parcel_track(pid):
 @app.route("/api/gps/encomenda/<int:pid>")
 @login_required()
 def api_gps_parcel(pid):
-    user = current_user()
-    row = query("SELECT * FROM parcels WHERE id=?", (pid,), one=True)
-    if not row:
-        return jsonify({"ok": False}), 404
-    if user["role"] == "passageiro" and row["sender_id"] != user["id"]:
-        return jsonify({"ok": False}), 403
-    if user["role"] == "motorista":
-        drv = driver_record(user["id"])
-        if not drv or drv["id"] != row["driver_id"]:
+    try:
+        for sql in (
+            "ALTER TABLE parcels ADD COLUMN driver_id INTEGER",
+            "ALTER TABLE drivers ADD COLUMN lat REAL",
+            "ALTER TABLE drivers ADD COLUMN lng REAL",
+            "ALTER TABLE drivers ADD COLUMN loc_updated_at TEXT",
+        ):
+            try:
+                execute(sql)
+            except Exception:
+                pass
+        user = current_user()
+        row = query("SELECT * FROM parcels WHERE id=?", (pid,), one=True)
+        if not row:
+            return jsonify({"ok": False, "erro": "nao_encontrada"}), 404
+        papel = user["role"] if user else ""
+        if papel == "passageiro" and row["sender_id"] != user["id"]:
             return jsonify({"ok": False}), 403
-    drv = query(
-        "SELECT lat, lng, plate, loc_updated_at FROM drivers WHERE id=?",
-        (row["driver_id"] or 0),
-        one=True,
-    )
-    return jsonify(
-        {
+        driver_id = row["driver_id"] if "driver_id" in row.keys() else None
+        if papel == "motorista":
+            drv_user = driver_record(user["id"])
+            if not drv_user or drv_user["id"] != driver_id:
+                return jsonify({"ok": False}), 403
+        drv = None
+        if driver_id:
+            drv = query("SELECT lat, lng, plate, loc_updated_at FROM drivers WHERE id=?", (driver_id,), one=True)
+        return jsonify({
             "ok": True,
-            "status": row["status"],
+            "status": row["status"] if row else "",
             "lat": drv["lat"] if drv else None,
             "lng": drv["lng"] if drv else None,
             "plate": drv["plate"] if drv else None,
             "quando": drv["loc_updated_at"] if drv else None,
-        }
-    )
+        })
+    except Exception:
+        return jsonify({"ok": False, "lat": None, "lng": None}), 200
 
 
 @app.route("/admin/encomendas")
@@ -4900,4 +4911,5 @@ def page_suporte():
     else:
         tickets = query("SELECT * FROM support_tickets WHERE user_id=? ORDER BY id DESC LIMIT 20", (user["id"],))
     return render_template("suporte.html", tickets=tickets)
+
 
