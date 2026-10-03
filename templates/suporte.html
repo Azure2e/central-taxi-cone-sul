@@ -4,14 +4,18 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 <style>
 .nav,.admin-nav,#pwa-install{display:none!important}
-.sup-hero{background:linear-gradient(165deg,#0f172a,#1e3a5f 50%,#0f766e);color:#fff;padding:28px 18px 32px;border-radius:0 0 32px 32px}
-.sup-hero .brand-sub{color:#7dd3fc;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:0}
-.titulo-painel{display:flex;align-items:center;gap:14px;margin:10px 0 0;font-size:26px;font-weight:800}
-.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
-.sup-card{background:#fff;border-radius:22px;padding:18px;margin:16px;box-shadow:0 14px 32px rgba(15,23,42,.08)}
-.sup-card input,.sup-card textarea,.sup-card select{width:100%;border-radius:14px;border:1px solid #e2e8f0;padding:12px;margin:8px 0 12px}
-.sup-btn{width:100%;min-height:52px;border:0;border-radius:16px;background:#06C167;color:#fff;font-weight:800}
-.ticket{padding:12px 0;border-bottom:1px solid #eef2f7}
+.sup-hero{background:linear-gradient(165deg,#082f49,#0f172a 42%,#0f766e);color:#fff;padding:28px 18px 34px;border-radius:0 0 32px 32px;box-shadow:0 18px 40px rgba(8,47,73,.28)}
+.sup-hero .brand-sub{color:#7dd3fc;letter-spacing:.18em;text-transform:uppercase;font-size:11px;margin:0}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:12px 0 0;font-size:28px;font-weight:800}
+.btn-menu-hero{width:50px;height:50px;border:0;border-radius:16px;background:#06C167;color:#fff;font-size:22px;box-shadow:0 8px 18px rgba(6,193,103,.35)}
+.sup-lead{margin:10px 0 0;color:#cbd5e1}
+.sup-card{background:#fff;border-radius:24px;padding:18px;margin:16px;box-shadow:0 14px 32px rgba(15,23,42,.08)}
+.sup-card h2{margin:0 0 8px;font-size:18px}
+.sup-card input,.sup-card textarea,.sup-card select{width:100%;border-radius:14px;border:1px solid #e2e8f0;padding:12px;margin:8px 0 14px;background:#f8fafc}
+.sup-btn{width:100%;min-height:54px;border:0;border-radius:16px;background:#06C167;color:#fff;font-size:16px;font-weight:800}
+.ticket{padding:14px 0;border-bottom:1px solid #eef2f7}
+.badge{display:inline-block;background:#ecfdf5;color:#047857;border-radius:999px;padding:2px 8px;font-size:12px}
+.empty{text-align:center;color:#64748b;padding:12px 0}
 </style>
 {% endblock %}
 {% block body_class %}admin-body{% endblock %}
@@ -19,8 +23,10 @@
 <div class="sup-hero">
   <p class="brand-sub">Cone Sul</p>
   <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Suporte</span></h1>
+  <p class="sup-lead">Fale com a central. O chamado abre o WhatsApp do administrador.</p>
 </div>
 <div class="sup-card">
+  <h2>Abrir chamado</h2>
   <form method="post" action="/suporte">
     <input type="hidden" name="csrf" value="{{ csrf_token }}">
     <label>Assunto</label>
@@ -33,15 +39,19 @@
     </select>
     <label>Mensagem</label>
     <textarea name="mensagem" rows="4" required placeholder="Descreva o que aconteceu"></textarea>
-    <button class="sup-btn" type="submit">Enviar ao suporte</button>
+    <button class="sup-btn" type="submit">Enviar e falar no WhatsApp</button>
   </form>
 </div>
 <div class="sup-card">
-  <strong>Chamados</strong>
+  <h2>Chamados</h2>
   {% for t in tickets %}
-  <div class="ticket"><b>{{ t.assunto }}</b> · {{ t.nome }}<br>{{ t.mensagem }}<br><small>{{ t.created_at }} · {{ t.status }}</small></div>
+  <div class="ticket">
+    <b>{{ t.assunto }}</b> · {{ t.nome }} <span class="badge">{{ t.status }}</span>
+    <p style="margin:6px 0">{{ t.mensagem }}</p>
+    <small>{{ t.created_at }}</small>
+  </div>
   {% else %}
-  <p>Nenhum chamado ainda.</p>
+  <div class="empty">💬 Nenhum chamado ainda.</div>
   {% endfor %}
 </div>
 {% endblock %}
