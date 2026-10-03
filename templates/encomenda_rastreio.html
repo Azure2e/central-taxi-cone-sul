@@ -29,7 +29,7 @@
     <div class="step"><span class="dot"></span><div>{% if p.driver_name %}Taxista {{ p.driver_name }} · {{ p.plate }}{% else %}Aguardando taxista{% endif %}</div></div>
     <div class="step"><span class="dot"></span><div id="passo-gps">Posição ao vivo aparece quando o taxista liga o GPS</div></div>
   </div>
-  {% if p.recipient_phone %}<a class="btn-green" href="https://wa.me/55{{ p.recipient_phone }}">WhatsApp de quem recebe</a>{% endif %}
+  {% if p.recipient_phone %}<a class="btn-green" href="https://wa.me/55{{ p.recipient_phone }}?text=Sua%20encomenda%20Cone%20Sul%20%23{{ p.id }}%20esta%20a%20caminho.%20Acompanhe:%20{{ request.host_url }}rastreio/{{ p.id }}">Enviar link no WhatsApp</a>{% endif %}
   <a class="btn btn-ghost btn-block" href="/encomenda">Minhas encomendas</a>
 </div>
 <script>
@@ -71,3 +71,4 @@
 })();
 </script>
 {% endblock %}
+

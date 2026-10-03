@@ -4913,3 +4913,20 @@ def page_suporte():
     return render_template("suporte.html", tickets=tickets)
 
 
+
+@app.route("/rastreio/<int:pid>")
+def rastreio_publico(pid):
+    row = query(
+        """SELECT parcels.*, routes.label AS route_label, du.name AS driver_name, d.plate
+           FROM parcels
+           LEFT JOIN routes ON routes.id = parcels.route_id
+           LEFT JOIN drivers d ON d.id = parcels.driver_id
+           LEFT JOIN users du ON du.id = d.user_id
+           WHERE parcels.id=?""",
+        (pid,),
+        one=True,
+    )
+    if not row:
+        flash("Encomenda nao encontrada.", "err")
+        return redirect("/")
+    return render_template("encomenda_rastreio.html", p=row)
