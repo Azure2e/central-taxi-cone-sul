@@ -4888,10 +4888,16 @@ def page_suporte():
             "INSERT INTO support_tickets (user_id, nome, role, assunto, mensagem, status, created_at) VALUES (?,?,?,?,?,?,?)",
             (user["id"], user["name"], user["role"], request.form.get("assunto") or "Outro", msg[:500], "aberto", datetime.now().isoformat(timespec="seconds")),
         )
-        flash("Chamado enviado. A central vai ver.", "ok")
-        return redirect("/suporte")
+        flash("Chamado enviado. Abrindo o WhatsApp do administrador.", "ok")
+        cfg = {r["key"]: r["value"] for r in query("SELECT * FROM security_settings")}
+        fone = "".join(ch for ch in str(cfg.get("wa_phone") or "69999990000") if ch.isdigit())
+        if not fone.startswith("55"):
+            fone = "55" + fone
+        texto = "Suporte Cone Sul: " + (request.form.get("assunto") or "Outro") + " - " + msg[:180]
+        return redirect("https://wa.me/" + fone + "?text=" + texto.replace(" ", "%20"))
     if user["role"] == "admin":
         tickets = query("SELECT * FROM support_tickets ORDER BY id DESC LIMIT 30")
     else:
         tickets = query("SELECT * FROM support_tickets WHERE user_id=? ORDER BY id DESC LIMIT 20", (user["id"],))
     return render_template("suporte.html", tickets=tickets)
+
