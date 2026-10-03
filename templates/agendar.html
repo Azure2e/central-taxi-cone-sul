@@ -1,9 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Agendar família{% endblock %}
-{% block content %}
-<div class="topbar">
-  <div class="brand-sub">Módulo familiar</div>
-  <h1>Agendar a casa</h1>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.fam-hero{background:linear-gradient(165deg,#022c22,#0f172a 48%,#14532d);color:#fff;padding:26px 18px 30px;border-radius:0 0 32px 32px}
+.fam-hero .brand-sub{color:#86efac;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:0}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:10px 0 0;font-size:26px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.page{padding:16px 14px 40px;background:#f4f7f6}
+.page form,.person-box{background:#fff;border-radius:22px;padding:16px;box-shadow:0 12px 28px rgba(15,23,42,.08)}
+.person-box{margin:12px 0}
+.page input,.page select,.page textarea{width:100%;min-height:48px;border-radius:14px;border:1px solid #e2e8f0;padding:10px 12px;background:#f8fafc}
+#map,#mapa{height:220px;border-radius:18px;margin:14px 0;overflow:hidden}
+.btn-green,.btn-primary{background:#06C167;border:0;color:#fff;border-radius:16px;min-height:52px;font-weight:800}
+.btn-ghost{border-radius:14px;min-height:46px}
+</style>
+{% endblock %}{% block content %}
+<div class="fam-hero">
+  <p class="brand-sub">Modulo familiar</p>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Agendar a casa</span></h1>
 </div>
 <div class="page" style="padding-bottom:28px">
   <p class="hint">Uma corrida, um endereço, até <b>4 pessoas da mesma casa</b>.</p>
@@ -140,5 +156,6 @@
 })();
 </script>
 {% endblock %}
+
 
 
