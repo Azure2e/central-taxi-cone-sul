@@ -1,6 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Segurança{% endblock %}
-{% block extra_css %}
+{% block extra_css %}<style>
+.fleet-card{background:#fff;border:0;border-radius:22px;padding:16px;margin:12px 0;box-shadow:0 14px 32px rgba(15,23,42,.08)}
+.fleet-card header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.fleet-card .sub{color:#64748b;margin-top:4px}
+.badge{border-radius:999px;padding:3px 8px;font-size:12px;margin-left:4px}
+.badge.gray{background:#f1f5f9;color:#475569}
+.badge.blue{background:#ecfdf5;color:#047857}
+.fleet-meta{list-style:none;padding:8px 0;margin:0;color:#475569}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.actions form{margin:0}
+.actions .btn{border:0;border-radius:12px;min-height:40px;padding:0 12px;font-weight:700}
+.btn-red{background:#fee2e2;color:#b91c1c}
+.btn-ghost{background:#f8fafc;color:#0f172a;border:1px solid #e2e8f0!important}
+.actions input{min-height:40px;border-radius:12px;border:1px solid #e2e8f0;padding:8px 10px}
+</style>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 <style>
 .nav,.admin-nav,#pwa-install{display:none!important}
@@ -251,6 +265,7 @@
   {% endfor %}
 </div>
 {% endblock %}
+
 
 
 
