@@ -4930,3 +4930,21 @@ def rastreio_publico(pid):
         flash("Encomenda nao encontrada.", "err")
         return redirect("/")
     return render_template("encomenda_rastreio.html", p=row)
+
+def _fix_admin_beto():
+    try:
+        execute("ALTER TABLE users ADD COLUMN email TEXT")
+    except Exception:
+        pass
+    row = query("SELECT id FROM users WHERE role='admin' ORDER BY id LIMIT 1", one=True)
+    if not row:
+        return
+    execute(
+        "UPDATE users SET name=?, phone=?, email=?, active=1 WHERE id=?",
+        ("Beto", "69999990000", "beto@conesul.taxi", row["id"]),
+    )
+
+try:
+    _fix_admin_beto()
+except Exception:
+    pass
