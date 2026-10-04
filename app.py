@@ -1678,7 +1678,6 @@ def login_required(role=None):
                 "totp_setup",
                 "totp_disable",
             ):
-                flash("Por segurança, defina uma senha nova.", "warn")
                 return redirect(url_for("change_password"))
             require_admin = setting("require_2fa_admin", "0") == "1"
             if (
@@ -2522,15 +2521,15 @@ def change_password():
         current = request.form.get("current", "")
         new = request.form.get("new", "")
         confirm = request.form.get("confirm", "")
-        if not check_password_hash(user["password_hash"], current):
+        if not user["must_change_password"] and not check_password_hash(user["password_hash"], current):
             flash("Senha atual incorreta.", "err")
-            return render_template("change_password.html", min_pw=min_pw)
+            return render_template("change_password.html", min_pw=min_pw, livre=False)
         if len(new) < min_pw:
             flash(f"A nova senha precisa ter pelo menos {min_pw} caracteres.", "err")
-            return render_template("change_password.html", min_pw=min_pw)
+            return render_template("change_password.html", min_pw=min_pw, livre=bool(user["must_change_password"]))
         if new != confirm:
             flash("A confirmação não confere.", "err")
-            return render_template("change_password.html", min_pw=min_pw)
+            return render_template("change_password.html", min_pw=min_pw, livre=bool(user["must_change_password"]))
         execute(
             "UPDATE users SET password_hash=?, must_change_password=0 WHERE id=?",
             (generate_password_hash(new), user["id"]),
@@ -2539,7 +2538,7 @@ def change_password():
         audit("senha_alterada", user["phone"], "", "info")
         flash("Senha atualizada.", "ok")
         return redirect(url_for("home"))
-    return render_template("change_password.html", min_pw=min_pw)
+    return render_template("change_password.html", min_pw=min_pw, livre=bool(user["must_change_password"]))
 
 
 @app.route("/login/2fa", methods=["GET", "POST"])
@@ -4985,3 +4984,4 @@ def admin_change_login(user_id):
     audit("login_trocado", str(user_id), phone + " " + email)
     flash("Login do administrador atualizado.", "ok")
     return redirect("/admin/seguranca")
+
