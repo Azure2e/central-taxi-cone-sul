@@ -1,12 +1,60 @@
 {% extends "base.html" %}
-{% block title %}Banco SQL + JWT{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">{% endblock %}
-{% block body_class %}admin-body{% endblock %}
-{% block shell_class %}admin-shell admin-list-page{% endblock %}
+{% block title %}Banco SQL + JWT<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.sql-hero{background:linear-gradient(165deg,#0f172a,#1e3a5f 50%,#0f766e);color:#fff;padding:26px 18px 30px;border-radius:0 0 32px 32px}
+.sql-hero .brand-sub{color:#7dd3fc;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:0}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:10px 0 0;font-size:26px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.page{padding:16px 14px 40px;background:#f4f7f6}
+.soft-card,.card{background:#fff;border:0;border-radius:18px;padding:14px 16px;margin:10px 0;box-shadow:0 10px 24px rgba(15,23,42,.08)}
+.card{display:flex;justify-content:space-between;align-items:center}
+.card strong{color:#0f766e;font-size:18px}
+.page input{width:100%;min-height:48px;border-radius:14px;border:1px solid #e2e8f0;padding:10px 12px}
+.btn-primary{background:#06C167;border:0;color:#fff;border-radius:14px;min-height:48px;font-weight:800}
+</style>{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}"><style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.sql-hero{background:linear-gradient(165deg,#0f172a,#1e3a5f 50%,#0f766e);color:#fff;padding:26px 18px 30px;border-radius:0 0 32px 32px}
+.sql-hero .brand-sub{color:#7dd3fc;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:0}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:10px 0 0;font-size:26px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.page{padding:16px 14px 40px;background:#f4f7f6}
+.soft-card,.card{background:#fff;border:0;border-radius:18px;padding:14px 16px;margin:10px 0;box-shadow:0 10px 24px rgba(15,23,42,.08)}
+.card{display:flex;justify-content:space-between;align-items:center}
+.card strong{color:#0f766e;font-size:18px}
+.page input{width:100%;min-height:48px;border-radius:14px;border:1px solid #e2e8f0;padding:10px 12px}
+.btn-primary{background:#06C167;border:0;color:#fff;border-radius:14px;min-height:48px;font-weight:800}
+</style>{% endblock %}
+{% block body_class %}admin-body<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.sql-hero{background:linear-gradient(165deg,#0f172a,#1e3a5f 50%,#0f766e);color:#fff;padding:26px 18px 30px;border-radius:0 0 32px 32px}
+.sql-hero .brand-sub{color:#7dd3fc;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:0}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:10px 0 0;font-size:26px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.page{padding:16px 14px 40px;background:#f4f7f6}
+.soft-card,.card{background:#fff;border:0;border-radius:18px;padding:14px 16px;margin:10px 0;box-shadow:0 10px 24px rgba(15,23,42,.08)}
+.card{display:flex;justify-content:space-between;align-items:center}
+.card strong{color:#0f766e;font-size:18px}
+.page input{width:100%;min-height:48px;border-radius:14px;border:1px solid #e2e8f0;padding:10px 12px}
+.btn-primary{background:#06C167;border:0;color:#fff;border-radius:14px;min-height:48px;font-weight:800}
+</style>{% endblock %}
+{% block shell_class %}admin-shell admin-list-page<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.sql-hero{background:linear-gradient(165deg,#0f172a,#1e3a5f 50%,#0f766e);color:#fff;padding:26px 18px 30px;border-radius:0 0 32px 32px}
+.sql-hero .brand-sub{color:#7dd3fc;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:0}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:10px 0 0;font-size:26px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.page{padding:16px 14px 40px;background:#f4f7f6}
+.soft-card,.card{background:#fff;border:0;border-radius:18px;padding:14px 16px;margin:10px 0;box-shadow:0 10px 24px rgba(15,23,42,.08)}
+.card{display:flex;justify-content:space-between;align-items:center}
+.card strong{color:#0f766e;font-size:18px}
+.page input{width:100%;min-height:48px;border-radius:14px;border:1px solid #e2e8f0;padding:10px 12px}
+.btn-primary{background:#06C167;border:0;color:#fff;border-radius:14px;min-height:48px;font-weight:800}
+</style>{% endblock %}
 {% block content %}
-<div class="topbar">
-  <div class="brand-sub">Integração</div>
-  <h1>Banco SQL e JWT</h1>
+<div class="sql-hero">
+  <p class="brand-sub">Integração</p>
+  <h1 class="titulo-painel"><button type="button" id="btnMenu" class="btn-menu-hero">☰</button> <span>Banco SQL e JWT</span></h1>
 </div>
 <div class="page">
   <div class="soft-card">
@@ -37,6 +85,19 @@
   <a class="btn btn-ghost btn-block" href="{{ url_for('admin_avisos') }}">Ver lembretes do app</a>
   <a class="btn btn-ghost btn-block" href="{{ url_for('admin_config') }}">Voltar</a>
 </div>
-{% endblock %}
+<style>
+.nav,.admin-nav,#pwa-install{display:none!important}
+.sql-hero{background:linear-gradient(165deg,#0f172a,#1e3a5f 50%,#0f766e);color:#fff;padding:26px 18px 30px;border-radius:0 0 32px 32px}
+.sql-hero .brand-sub{color:#7dd3fc;letter-spacing:.16em;text-transform:uppercase;font-size:11px;margin:0}
+.titulo-painel{display:flex;align-items:center;gap:14px;margin:10px 0 0;font-size:26px;font-weight:800}
+.btn-menu-hero{width:48px;height:48px;border:0;border-radius:14px;background:#06C167;color:#fff;font-size:22px}
+.page{padding:16px 14px 40px;background:#f4f7f6}
+.soft-card,.card{background:#fff;border:0;border-radius:18px;padding:14px 16px;margin:10px 0;box-shadow:0 10px 24px rgba(15,23,42,.08)}
+.card{display:flex;justify-content:space-between;align-items:center}
+.card strong{color:#0f766e;font-size:18px}
+.page input{width:100%;min-height:48px;border-radius:14px;border:1px solid #e2e8f0;padding:10px 12px}
+.btn-primary{background:#06C167;border:0;color:#fff;border-radius:14px;min-height:48px;font-weight:800}
+</style>{% endblock %}
+
 
 
