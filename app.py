@@ -4948,3 +4948,19 @@ try:
     _fix_admin_beto()
 except Exception:
     pass
+
+@app.route("/admin/usuario/<int:user_id>/email", methods=["POST"])
+@login_required("admin")
+def admin_change_email(user_id):
+    email = (request.form.get("email") or "").strip().lower()
+    if "@" not in email or "." not in email:
+        flash("Digite um e-mail valido.", "err")
+        return redirect("/admin/seguranca")
+    try:
+        execute("ALTER TABLE users ADD COLUMN email TEXT")
+    except Exception:
+        pass
+    execute("UPDATE users SET email=? WHERE id=?", (email, user_id))
+    audit("email_trocado", str(user_id), email)
+    flash("E-mail atualizado.", "ok")
+    return redirect("/admin/seguranca")

@@ -193,7 +193,11 @@
       </form>
       {% endif %}
       <form method="post" action="{{ url_for('admin_reset_password', user_id=u.id) }}" onsubmit="return confirm('Gerar senha temporária para {{ u.name }}?')">
-        <button class="btn btn-ghost btn-sm" type="submit">Nova senha</button>
+        <button class="btn btn-ghost btn-sm" type="submit">Nova senha</button></form><form method="post" action="/admin/usuario/{{ u.id }}/email" style="display:flex;gap:8px;margin-top:8px">
+        <input type="hidden" name="csrf" value="{{ csrf_token }}">
+        <input name="email" value="{{ u.email or '' }}" placeholder="novo e-mail" style="min-height:40px;border-radius:12px;border:1px solid #e2e8f0;padding:8px">
+        <button class="btn btn-ghost btn-sm" type="submit">Trocar e-mail</button>
+      </form>
       </form>
       {% if u.totp_enabled %}
       <form method="post" action="{{ url_for('admin_reset_2fa', user_id=u.id) }}">
@@ -242,6 +246,7 @@
   {% endfor %}
 </div>
 {% endblock %}
+
 
 
 
