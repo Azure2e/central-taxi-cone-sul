@@ -4964,3 +4964,24 @@ def admin_change_email(user_id):
     audit("email_trocado", str(user_id), email)
     flash("E-mail atualizado.", "ok")
     return redirect("/admin/seguranca")
+
+@app.route("/admin/usuario/<int:user_id>/login", methods=["POST"])
+@login_required("admin")
+def admin_change_login(user_id):
+    phone = "".join(ch for ch in (request.form.get("phone") or "") if ch.isdigit())
+    email = (request.form.get("email") or "").strip().lower()
+    if len(phone) < 10:
+        flash("Telefone de login invalido.", "err")
+        return redirect("/admin/seguranca")
+    try:
+        execute("ALTER TABLE users ADD COLUMN email TEXT")
+    except Exception:
+        pass
+    outro = query("SELECT id FROM users WHERE phone=? AND id<>?", (phone, user_id), one=True)
+    if outro:
+        flash("Esse telefone ja esta em outra conta.", "err")
+        return redirect("/admin/seguranca")
+    execute("UPDATE users SET phone=?, email=? WHERE id=?", (phone, email, user_id))
+    audit("login_trocado", str(user_id), phone + " " + email)
+    flash("Login do administrador atualizado.", "ok")
+    return redirect("/admin/seguranca")
